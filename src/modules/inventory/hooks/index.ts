@@ -1,0 +1,1 @@
+export { useInventoryNavigation } from './useInventoryNavigation';

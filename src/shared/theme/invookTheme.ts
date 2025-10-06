@@ -1,89 +1,69 @@
 import { createTheme } from '@mui/material/styles';
 
-export const invookTheme = createTheme({
+const invookTheme = createTheme({
   palette: {
     primary: {
-      main: '#2e7d32', 
+      main: '#2e7d32', // Verde principal para coincidir con el diseño
       light: '#4caf50',
       dark: '#1b5e20',
-      contrastText: '#ffffff',
+      contrastText: '#fff',
     },
     secondary: {
-      main: '#ffeb3b', 
-      light: '#ffff72',
-      dark: '#c8b900',
-      contrastText: '#000000',
+      main: '#4caf50', // Verde secundario
+      light: '#81c784',
+      dark: '#388e3c',
+      contrastText: '#fff',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#f1f8e9',
       paper: '#ffffff',
     },
     text: {
-      primary: '#212121',
-      secondary: '#757575',
-    },
-    error: {
-      main: '#f44336',
-    },
-    warning: {
-      main: '#ff9800',
-    },
-    info: {
-      main: '#2196f3',
-    },
-    success: {
-      main: '#4caf50',
+      primary: '#1b5e20',
+      secondary: '#388e3c',
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: [
+      'Roboto',
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+    ].join(','),
     h1: {
+      fontSize: '2.5rem',
       fontWeight: 600,
     },
     h2: {
+      fontSize: '2rem',
       fontWeight: 600,
     },
     h3: {
+      fontSize: '1.75rem',
       fontWeight: 600,
     },
     h4: {
+      fontSize: '1.5rem',
       fontWeight: 600,
     },
     h5: {
+      fontSize: '1.25rem',
       fontWeight: 600,
     },
     h6: {
+      fontSize: '1rem',
       fontWeight: 600,
     },
-    button: {
-      textTransform: 'none', 
-      fontWeight: 500,
-    },
-  },
-  shape: {
-    borderRadius: 8,
   },
   components: {
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {
+          textTransform: 'none', 
           borderRadius: 8,
-          textTransform: 'none',
-          fontSize: '1rem',
-          fontWeight: 500,
-        },
-        contained: {
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          '&:hover': {
-            boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
-          },
         },
       },
     },
@@ -92,41 +72,13 @@ export const invookTheme = createTheme({
         root: {
           borderRadius: 12,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          '&:hover': {
-            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-          },
         },
       },
     },
-    MuiTextField: {
-      defaultProps: {
-        variant: 'outlined',
-      },
+    MuiAppBar: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
-            '&:hover fieldset': {
-              borderColor: '#2e7d32',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: '#2e7d32',
-            },
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         },
       },
     },

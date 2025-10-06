@@ -1,14 +1,14 @@
-export type MonitorState = 'ACTIVO' | 'INACTIVO';
-
 export interface Monitor {
   id: number;
-  rfid?: string;
-  name: string;
-  surname: string;
-  document: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  state: string;
+  role: string;
+  profile: string;
   phone?: string;
-  email?: string;
-  state: MonitorState;
-  role?: 'Admin' | 'Monitores';
+  rfid?: string;
+  names?: string;
+  surnames?: string;
 }
-

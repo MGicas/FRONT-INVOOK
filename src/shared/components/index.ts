@@ -1,1 +1,2 @@
-export { default as InvookLogo } from './InvookLogo';
+export { InvookLogo } from './InvookLogo';
+export { default as InvookLogoDefault } from './InvookLogo';

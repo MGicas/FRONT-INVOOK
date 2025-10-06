@@ -18,7 +18,7 @@ interface LoginFormProps {
   onSubmit?: () => void;
 }
 
-export const LoginForm = ({ onSubmit }: LoginFormProps) => {
+export const LoginForm = ({ onSubmit }: Readonly<LoginFormProps>) => {
   const { formState, updateField, handleLogin } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -162,6 +162,10 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
           'Ingresar'
         )}
       </Button>
+      
+      <Typography variant="body2" color="rgba(255,255,255,0.8)" sx={{ mt: 2, textAlign: 'center' }}>
+        Acceso exclusivo para administradores y monitores
+      </Typography>
     </Paper>
   );
 };

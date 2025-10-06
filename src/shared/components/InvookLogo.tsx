@@ -1,33 +1,43 @@
+import { Box } from '@mui/material';
+import invookLogo from '../../assets/INVOOK.png';
+
 interface InvookLogoProps {
   height?: number;
-  width?: string | number;
-  alt?: string;
-  className?: string;
+  width?: number;
+  onClick?: () => void;
   style?: React.CSSProperties;
 }
 
-const InvookLogo = ({ 
-  height = 50, 
-  width = 'auto', 
-  alt = 'INVOOK Logo',
-  className,
-  style,
-  ...props
+export const InvookLogo = ({ 
+  height = 60, 
+  width, 
+  onClick,
+  style 
 }: InvookLogoProps) => {
   return (
-    <img 
-      src="/src/assets/INVOOK.png"
-      alt={alt}
-      className={className}
-      style={{
-        height: `${height}px`,
-        width: width,
-        objectFit: 'contain',
-        display: 'block',
-        ...style
+    <Box
+      onClick={onClick}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: height,
+        width: width || 'auto',
+        cursor: onClick ? 'pointer' : 'default',
+        ...style,
       }}
-      {...props}
-    />
+    >
+      <img
+        src={invookLogo}
+        alt="Invook Logo"
+        style={{
+          height: `${height}px`,
+          width: width ? `${width}px` : 'auto',
+          objectFit: 'contain',
+          maxWidth: '100%',
+        }}
+      />
+    </Box>
   );
 };
 

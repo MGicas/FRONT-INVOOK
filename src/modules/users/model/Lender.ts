@@ -1,8 +1,16 @@
 export interface Lender {
-  id: number | string;
-  names: string;
+  id: string;
   rfid?: string;
-  surnames?: string;
+  names: string;
+  surnames: string;
+  email: string;
   phone?: string;
-  email?: string;
+  active: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  results: T[];
+  count: number;
+  next?: string;
+  previous?: string;
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import StatsService from '../service/StatsService';
 import type { Stats } from '../model/Stats';
 
+
 interface UseStatsState {
   stats: Stats | null;
   isLoading: boolean;

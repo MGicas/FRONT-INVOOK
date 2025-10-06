@@ -2,6 +2,7 @@ import apiService from '../../../shared/modules/instances/AxiosInstance';
 import { ENDPOINTS } from '../../../shared/service/Endpoints';
 import type { Stats } from '../model/Stats';
 
+
 export function StatsService() {
 
   async function getStats(): Promise<Stats> {

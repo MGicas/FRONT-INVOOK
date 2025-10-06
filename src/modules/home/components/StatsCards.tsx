@@ -1,7 +1,8 @@
 import { Card, CardContent, Typography, CircularProgress, Alert } from "@mui/material"
 import { Box } from "@mui/system"
 import { Assignment, AssignmentTurnedIn, AssignmentLate } from "@mui/icons-material"
-import { useStats } from "../hook/useStats"
+import { useStats } from "../hook/useStats";
+
 
 export const StatsCards = () => {
     const { stats, isLoading, error } = useStats();

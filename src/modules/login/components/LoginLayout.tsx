@@ -5,7 +5,7 @@ interface LoginLayoutProps {
   children: ReactNode;
 }
 
-export const LoginLayout = ({ children }: LoginLayoutProps) => {
+export const LoginLayout = ({ children }: Readonly<LoginLayoutProps>) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 

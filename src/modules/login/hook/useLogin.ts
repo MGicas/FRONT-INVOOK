@@ -1,83 +1,87 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthService } from '../service/AuthService';
-import { setAuth } from '../../../shared/utils/ClientData';
-import type { LoginCredentials, LoginFormState } from '../model/Login';
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../shared/hooks/useAuth';
+import { NavigationService } from '../../../shared/services/NavigationService';
+import type { LoginFormState } from '../model/Login';
 
-export const useLogin = () => {
+export function useLogin() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  
   const [formState, setFormState] = useState<LoginFormState>({
     username: '',
     password: '',
     error: '',
     isLoading: false,
   });
-  
-  const navigate = useNavigate();
-  const authService = AuthService();
 
-  const updateField = (field: keyof Pick<LoginFormState, 'username' | 'password'>, value: string) => {
+  useEffect(() => {
+    if (location.pathname !== '/login' && formState.isLoading) {
+      setFormState(prev => ({ ...prev, isLoading: false }));
+    }
+  }, [location.pathname, formState.isLoading]);
+
+  const updateField = useCallback((field: keyof Omit<LoginFormState, 'error' | 'isLoading'>, value: string) => {
     setFormState(prev => ({
       ...prev,
       [field]: value,
-      error: '', 
+      error: '',
     }));
+  }, []);
+
+  const setLoading = (loading: boolean) => {
+    setFormState(prev => ({ ...prev, isLoading: loading }));
   };
 
-  const handleLogin = async (credentials?: LoginCredentials) => {
-    const loginData = credentials || {
-      username: formState.username,
-      password: formState.password,
-    };
+  const setError = (error: string) => {
+    setFormState(prev => ({ ...prev, error, isLoading: false }));
+  };
+
+  const performLogin = useCallback(async (username: string, password: string) => {
+    try {
+      const result = await login(username, password);
+      
+      if (result.success && result.user) {
+        const destinationRoute = NavigationService.getRouteForUser(result.user);
+        
+        setLoading(false);
+        
+        setTimeout(() => {
+          navigate(destinationRoute, { replace: true });
+        }, 100);
+        return;
+      }
+      
+      if (result.user && !NavigationService.isAuthorizedRole(result.user)) {
+        setError(`Acceso denegado. El rol '${result.user?.role}' no tiene permisos para acceder al sistema.`);
+        return;
+      }
+      
+      setError('Credenciales inválidas. Por favor, verifica tu usuario y contraseña.');
+      
+    } catch (error) {
+      console.error(error)
+      setError('Error al iniciar sesión. Intenta nuevamente.');
+    }
+  }, [login, navigate]);
+
+  const handleLogin = useCallback(async () => {
+    const { username, password } = formState;
     
-    if (!loginData.username.trim() || !loginData.password.trim()) {
-      setFormState(prev => ({
-        ...prev,
-        error: 'Por favor, completa todos los campos',
-      }));
+    if (!username || !password) {
+      setError('Por favor, completa todos los campos');
       return;
     }
 
-    setFormState(prev => ({ ...prev, isLoading: true, error: '' }));
-
-    try {
-      const response = await authService.login(loginData);
-      setAuth(response.access, response.refresh, response.user);
-      setFormState({
-        username: '',
-        password: '',
-        error: '',
-        isLoading: false,
-      });
-      navigate('/home');
-    } catch (error) {
-      setFormState(prev => ({
-        ...prev,
-        error: error instanceof Error ? error.message : 'Error al iniciar sesión',
-        isLoading: false,
-      }));
-    }
-  };
-
-  const clearError = () => {
-    setFormState(prev => ({ ...prev, error: '' }));
-  };
-
-  const resetForm = () => {
-    setFormState({
-      username: '',
-      password: '',
-      error: '',
-      isLoading: false,
-    });
-  };
+    setLoading(true);
+    
+    await performLogin(username, password);
+  }, [formState, performLogin]);
 
   return {
     formState,
     updateField,
     handleLogin,
-    clearError,
-    resetForm,
-    isAuthenticated: authService.isAuthenticated(),
-    getCurrentUser: authService.getCurrentUser,
   };
-};
+}

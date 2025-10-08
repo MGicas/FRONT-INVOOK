@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Toolbar, TextField, InputAdornment, IconButton } from '@mui/material';
+import { Box, Typography, Button, Toolbar, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Assignment as AssignmentIcon, Add as AddIcon, ArrowBack as ArrowBackIcon, Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { useCallback, useState } from 'react';
 
@@ -8,9 +8,11 @@ interface LoansHeaderProps {
   onSearch: (term: string) => void;
   onClearSearch: () => void;
   totalCount: number;
+  status?: string;
+  onChangeStatus?: (status: string) => void;
 }
 
-const LoansHeader = ({ onBack, onAddNew, onSearch, onClearSearch, totalCount }: LoansHeaderProps) => {
+const LoansHeader = ({ onBack, onAddNew, onSearch, onClearSearch, totalCount, status = '', onChangeStatus }: LoansHeaderProps) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +54,21 @@ const LoansHeader = ({ onBack, onAddNew, onSearch, onClearSearch, totalCount }: 
           Lista de Préstamos ({totalCount})
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel id="status-filter-label">Estado</InputLabel>
+            <Select
+              labelId="status-filter-label"
+              value={status}
+              label="Estado"
+              onChange={(e) => onChangeStatus && onChangeStatus(e.target.value)}
+              sx={{ backgroundColor: 'white', '& .MuiSelect-select': { color: '#000' } }}
+            >
+              <MenuItem value="">Todos</MenuItem>
+              <MenuItem value="ABIERTO">ABIERTO</MenuItem>
+              <MenuItem value="CERRADO">CERRADO</MenuItem>
+              <MenuItem value="VENCIDO">VENCIDO</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             size="small"
             placeholder="Buscar por responsable, recurso o estado..."

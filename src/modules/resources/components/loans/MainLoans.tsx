@@ -1,4 +1,4 @@
-import { Box, Container, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Checkbox, List, ListItem, ListItemText, ListItemIcon, Chip, MenuItem, Select, FormControl, InputLabel, Modal, TextField, Stack } from "@mui/material";
+import { Box, Container, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText, Chip, MenuItem, Select, FormControl, InputLabel, Modal, TextField, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCallback, useState, useEffect } from "react";
 import LoansHeader from "./LoansHeader";
@@ -10,7 +10,6 @@ import { getHardware } from "../../../inventory/service/hardware/getHardware";
 import { updateLoan } from "../../service/updateLoan";
 import { updateHardwareState } from "../../../inventory/service/hardware/updateHardware";
 import type { Loan, HardwareItem } from "../../model/Loan";
-import type { Hardware } from "../../../inventory/model/Hardware";
 
 const HARDWARE_STATES = [
   "BUENO",
@@ -34,7 +33,7 @@ const MainLoans = () => {
   const [detailLoanId, setDetailLoanId] = useState<string | null>(null);
   const [detailLoan, setDetailLoan] = useState<Loan | null>(null);
 
-  const [selectedHardware, setSelectedHardware] = useState<string[]>([]);
+  // const [selectedHardware, setSelectedHardware] = useState<string[]>([]); // no longer used
   const [returnModalOpen, setReturnModalOpen] = useState(false);
   const [returningHardwareSerial, setReturningHardwareSerial] = useState<string | null>(null);
   const [returnState, setReturnState] = useState<string>("BUENO");
@@ -47,16 +46,37 @@ const MainLoans = () => {
   const [returnSuccess, setReturnSuccess] = useState(false);
   const [returnError, setReturnError] = useState<string | null>(null);
 
+  // Filtros
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+
+  const isSameDate = (a?: string | null, b?: string | null) => {
+    if (!a || !b) return false;
+    const da = new Date(a);
+    const db = new Date(b);
+    return da.toDateString() === db.toDateString();
+  };
+
+  const computeStatus = (loan: Loan): Loan => {
+    // Si no está cerrado y la fecha inicio y fecha fin no es la misma, marcar como VENCIDO
+    if (loan.status !== "CERRADO" && loan.return_date && !isSameDate(loan.loan_date, loan.return_date)) {
+      return { ...loan, status: "VENCIDO" };
+    }
+    return loan;
+  };
+
   // Cargar préstamos
   useEffect(() => {
     setLoading(true);
-    getLoans({ page: currentPage + 1, page_size: pageSize })
+    getLoans({ page: currentPage + 1, page_size: pageSize, search: searchTerm || undefined, status: statusFilter || undefined })
       .then(res => {
         if (Array.isArray(res)) {
-          setLoans(res);
-          setTotalCount(res.length);
+          const mapped = res.map(computeStatus);
+          setLoans(mapped);
+          setTotalCount(mapped.length);
         } else if (res.results) {
-          setLoans(res.results);
+          const mapped = res.results.map(computeStatus);
+          setLoans(mapped);
           setTotalCount(res.count);
         } else {
           setLoans([]);
@@ -66,7 +86,7 @@ const MainLoans = () => {
       })
       .catch(() => setError("Error al cargar préstamos"))
       .finally(() => setLoading(false));
-  }, [currentPage]);
+  }, [currentPage, searchTerm, statusFilter]);
 
   // Cargar detalle de préstamo
   useEffect(() => {
@@ -74,14 +94,14 @@ const MainLoans = () => {
       setLoading(true);
       getLoan(detailLoanId)
         .then(data => {
-          setDetailLoan(data);
-          setSelectedHardware([]);
+          setDetailLoan(computeStatus(data));
+          // setSelectedHardware([]);
         })
         .catch(() => setError("Error al cargar detalle"))
         .finally(() => setLoading(false));
     } else {
       setDetailLoan(null);
-      setSelectedHardware([]);
+      // setSelectedHardware([]);
     }
   }, [detailLoanId]);
 
@@ -89,13 +109,15 @@ const MainLoans = () => {
   const handleFormClose = useCallback(() => setIsFormOpen(false), []);
   const handleFormSuccess = useCallback((_created?: Loan) => {
     setLoading(true);
-    getLoans({ page: currentPage + 1, page_size: pageSize })
+    getLoans({ page: currentPage + 1, page_size: pageSize, search: searchTerm || undefined, status: statusFilter || undefined })
       .then(res => {
         if (Array.isArray(res)) {
-          setLoans(res);
-          setTotalCount(res.length);
+          const mapped = res.map(computeStatus);
+          setLoans(mapped);
+          setTotalCount(mapped.length);
         } else if (res.results) {
-          setLoans(res.results);
+          const mapped = res.results.map(computeStatus);
+          setLoans(mapped);
           setTotalCount(res.count);
         } else {
           setLoans([]);
@@ -106,11 +128,12 @@ const MainLoans = () => {
       .catch(() => setError("Error al cargar préstamos"))
       .finally(() => setLoading(false));
     setIsFormOpen(false);
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchTerm, statusFilter]);
 
   const handleBack = useCallback(() => { navigate("/resources"); }, [navigate]);
-  const handleSearch = useCallback((term: string) => { }, []);
-  const handleClearSearch = useCallback(() => { }, []);
+  const handleSearch = useCallback((term: string) => { setSearchTerm(term); setCurrentPage(0); }, []);
+  const handleClearSearch = useCallback(() => { setSearchTerm(""); setCurrentPage(0); }, []);
+  const handleChangeStatus = useCallback((status: string) => { setStatusFilter(status); setCurrentPage(0); }, []);
   const handleChangePage = (_: unknown, newPage: number) => { setCurrentPage(newPage); };
 
   // Ver detalle
@@ -122,9 +145,9 @@ const MainLoans = () => {
     setLoading(true);
     try {
       const updatedLoan = await updateLoan(loan.id, { status: "CERRADO", return_date: new Date().toISOString() });
-      setLoans(loans => loans.map(l => (l.id === loan.id ? updatedLoan : l)));
+      setLoans(loans => loans.map(l => (l.id === loan.id ? computeStatus(updatedLoan) : l)));
       if (detailLoan && detailLoan.id === loan.id) {
-        setDetailLoan(updatedLoan);
+        setDetailLoan(computeStatus(updatedLoan));
       }
       setError(null);
     } catch (err) {
@@ -246,6 +269,8 @@ const MainLoans = () => {
             onSearch={handleSearch}
             onClearSearch={handleClearSearch}
             totalCount={totalCount}
+            status={statusFilter}
+            onChangeStatus={handleChangeStatus}
           />
         </Box>
 

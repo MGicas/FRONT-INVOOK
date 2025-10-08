@@ -10,6 +10,11 @@ import MainSupply from '../../modules/inventory/components/supply/MainSupply';
 import MainUsers from '../../modules/users/components/MainUsers';
 import MainMonitor from '../../modules/users/components/monitors/MainMonitor';
 import MainLender from '../../modules/users/components/lenders/MainLender';
+import MainResource from '../../modules/resources/components/MainResource';
+import { RESOURCE_ROUTES } from '../../modules/resources/model/ResourceConstants';
+import MainLoans from '../../modules/resources/components/loans/MainLoans';
+import MainConsum from '../../modules/resources/components/consum/MainConsum';
+
 
 
 const TemporaryPage = ({ title }: { title: string }) => (
@@ -96,36 +101,36 @@ export default function AppRoutes() {
         />
         
         <Route
-          path="/resources"
+          path={RESOURCE_ROUTES.MAIN}
           element={
             <ProtectedRoutes isAuthenticated={isAuthenticated}>
               <Navbar />
               <main style={{ flex: 1, padding: '1rem' }}>
-                <TemporaryPage title="Resources" />
+                <MainResource />
               </main>
             </ProtectedRoutes>
           }
         />
         
         <Route
-          path="/resources/prestamos"
+          path={RESOURCE_ROUTES.LOANS}
           element={
             <ProtectedRoutes isAuthenticated={isAuthenticated}>
               <Navbar />
               <main style={{ flex: 1, padding: '1rem' }}>
-                <TemporaryPage title="Préstamos" />
+                <MainLoans />
               </main>
             </ProtectedRoutes>
           }
         />
         
         <Route
-          path="/resources/consumos"
+          path={RESOURCE_ROUTES.ONE_TIME}
           element={
             <ProtectedRoutes isAuthenticated={isAuthenticated}>
               <Navbar />
               <main style={{ flex: 1, padding: '1rem' }}>
-                <TemporaryPage title="Consumos" />
+                <MainConsum />
               </main>
             </ProtectedRoutes>
           }

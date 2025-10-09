@@ -6,14 +6,15 @@ import {
   CardContent,
   CardActions,
   Button,
+  Paper,
   useTheme,
 } from "@mui/material";
 import {
-  Assignment as AssignmentIcon,
+  AccountTree as ResourceIcon,
   ArrowForward as ArrowForwardIcon,
 } from "@mui/icons-material";
 import { getResourceOptions } from "../model";
-import { useResourceNavigation } from "../hooks";
+import { useResourceNavigation } from "../hook";
 
 const MainResource = () => {
   const theme = useTheme();
@@ -28,7 +29,7 @@ const MainResource = () => {
     <Container maxWidth="lg">
       <Box sx={{ py: 4 }}>
         <Box sx={{ mb: 4, textAlign: "center" }}>
-          <AssignmentIcon
+          <ResourceIcon
             sx={{ fontSize: 60, color: theme.palette.primary.main, mb: 2 }}
           />
           <Typography
@@ -105,16 +106,38 @@ const MainResource = () => {
                     backgroundColor: option.color,
                     "&:hover": {
                       backgroundColor: option.color,
-                      opacity: 0.9,
+                      filter: "brightness(0.9)",
                     },
+                    py: 1.5,
+                    fontSize: "1.1rem",
+                    fontWeight: "bold",
                   }}
                 >
-                  Gestionar
+                  Gestionar {option.title}
                 </Button>
               </CardActions>
             </Card>
           ))}
         </Box>
+        <Paper
+          sx={{
+            p: 4,
+            textAlign: "center",
+            backgroundColor: "rgba(25, 118, 210, 0.05)",
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{ mb: 2, color: theme.palette.primary.main }}
+          >
+            ¿Necesitas ayuda?
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+            Desde cada sección podrás registrar, consultar, editar y gestionar
+            los recursos correspondientes. También podrás generar reportes y
+            realizar seguimiento de préstamos.
+          </Typography>         
+        </Paper>
       </Box>
     </Container>
   );

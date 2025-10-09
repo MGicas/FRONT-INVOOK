@@ -1,37 +1,30 @@
-export interface ConsumLender {
-   id: string | number;
-   names: string;
-   surnames: string;
-   email: string;
- }
+interface SupplyDetail {
+    supply_code: string;
+    supply: string;
+    quantity: number;
+}
 
- export interface ConsumMonitorProfile {
-   rfid?: string;
-   names?: string;
-   surnames?: string;
-   phone?: string;
-   document_id?: string;
- }
+interface SupplyCreate {
+    supply_name: string;
+    quantity: number;
+}
 
- export interface ConsumMonitor {
-   id: string | number;
-   username: string;
-   email: string;
-   first_name: string;
-   last_name: string;
-   profile?: ConsumMonitorProfile;
- }
+export interface Consum {
+    id: string;
+    id_lender: string;
+    id_monitor: string;
+    supplies_detail?: SupplyDetail[];
+}
 
- export interface DeliveredSupply {
-   id?: string | number;
-   name: string;
-   quantity?: number;
- }
+export interface ConsumCreateRequest {
+    id_lender: string;
+    id_monitor: string;
+    supplies: SupplyCreate[];
+}
 
- export interface Consum {
-   id: string | number;
-   user: ConsumLender; // Usuario que recibe el consumo
-   monitor: ConsumMonitor; // Monitor que entrega
-   supplies: DeliveredSupply[]; // Suministros entregados
-   created_at?: string; // fecha del consumo
- }
+export interface ConsumCreateResponse {
+    id: string;
+    id_lender: string;
+    id_monitor: string;
+    supplies_detail: SupplyDetail[];
+}

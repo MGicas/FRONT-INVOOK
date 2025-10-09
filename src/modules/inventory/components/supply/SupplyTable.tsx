@@ -284,7 +284,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
                 width: "8%",
               }}
             >
-              Cuenta
+              Caja(s)
             </TableCell>
             <TableCell
               sx={{
@@ -297,7 +297,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
                 width: "10%",
               }}
             >
-              Existencia
+              Stock
             </TableCell>
             <TableCell
               sx={{
@@ -310,7 +310,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
                 width: "8%",
               }}
             >
-              Cantidad
+              Unidades
             </TableCell>
             <TableCell
               sx={{

@@ -11,26 +11,26 @@ import {
   ArrowBack as ArrowBackIcon,
   Search as SearchIcon,
   Clear as ClearIcon,
-  Inventory as InventoryIcon,
+  Assignment as AssignmentIcon,
   Add as AddIcon,
   Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '../../../inventory/hooks/common/useDebounce';
 
-interface ConsumHeaderProps {
+interface LoanHeaderProps {
   onBack: () => void;
   onAddNew: () => void;
-  onSearch?: (searchTerm: string) => void;
-  onClearSearch?: () => void;
+  onSearch: (term: string) => void;
+  onClearSearch: () => void;
   onRefresh: () => void;
   totalCount: number;
   showingCount: number;
-  searchTerm?: string;
+  searchTerm: string;
   loading: boolean;
 }
 
-const ConsumHeader = ({
+const LoanHeader = ({
   onBack,
   onAddNew,
   onSearch,
@@ -38,9 +38,9 @@ const ConsumHeader = ({
   onRefresh,
   totalCount,
   showingCount,
-  searchTerm: initialSearchTerm = "",
+  searchTerm: initialSearchTerm,
   loading,
-}: ConsumHeaderProps) => {
+}: LoanHeaderProps) => {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const { debounce } = useDebounce();
 
@@ -53,16 +53,16 @@ const ConsumHeader = ({
     setSearchTerm(value);
     debounce(() => {
       if (value.trim()) {
-        onSearch?.(value);
+        onSearch(value);
       } else {
-        onClearSearch?.();
+        onClearSearch();
       }
     }, 500);
   }, [onSearch, onClearSearch, debounce]);
 
   const handleClearSearch = useCallback(() => {
     setSearchTerm('');
-    onClearSearch?.();
+    onClearSearch();
   }, [onClearSearch]);
 
   return (
@@ -78,9 +78,9 @@ const ConsumHeader = ({
             Volver
           </Button>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <InventoryIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+            <AssignmentIcon sx={{ fontSize: 40, color: 'primary.main' }} />
             <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: '#000' }}>
-              Gestión de Consumibles
+              Gestión de Préstamos
             </Typography>
           </Box>
         </Box>
@@ -100,7 +100,7 @@ const ConsumHeader = ({
             onClick={onAddNew}
             sx={{ borderRadius: 2 }}
           >
-            Nuevo Consumo
+            Nuevo Préstamo
           </Button>
         </Box>
       </Box>
@@ -114,53 +114,51 @@ const ConsumHeader = ({
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}>
         <Typography variant="h6" component="div" sx={{ fontWeight: 'medium', color: '#000' }}>
-          Lista de Consumos ({showingCount} de {totalCount})
+          Lista de Préstamos ({showingCount} de {totalCount})
         </Typography>
         
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {onSearch && (
-            <TextField
-              size="small"
-              placeholder="Buscar por ID de consumo..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              disabled={loading}
-              sx={{ 
-                minWidth: 300,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'white',
-                  '& input': {
-                    color: '#000',
-                  }
+          <TextField
+            size="small"
+            placeholder="Buscar préstamos..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            disabled={loading}
+            sx={{ 
+              minWidth: 300,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'white',
+                '& input': {
+                  color: '#000',
                 }
-              }}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'primary.main' }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: searchTerm && (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={handleClearSearch}
-                        sx={{ color: 'grey.500' }}
-                        disabled={loading}
-                      >
-                        <ClearIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }
-              }}
-            />
-          )}
+              }
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: 'primary.main' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: searchTerm && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={handleClearSearch}
+                      sx={{ color: 'grey.500' }}
+                      disabled={loading}
+                    >
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }
+            }}
+          />
         </Box>
       </Toolbar>
     </>
   );
 };
 
-export default ConsumHeader;
+export default LoanHeader;

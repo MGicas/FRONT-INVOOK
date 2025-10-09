@@ -163,7 +163,6 @@ const MainLender = () => {
           onSuccess={handleEditSuccess}
         />
       </Box>
-      {/* Delete Dialog */}
       <LenderDeleteDialog
         open={isDeleteOpen}
         onClose={handleCloseDeleteDialog}

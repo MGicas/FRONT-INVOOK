@@ -35,8 +35,8 @@ export const updateHardware = async (
 export const updateHardwareState = async (
   serial: string,
   state: string
-): Promise<Hardware> => {
-  return apiService.patch<Hardware>(`inventory/hardware/${encodeURIComponent(serial)}/`, { state });
+): Promise<UpdateHardwareResponse> => {
+  return updateHardware(serial, { state });
 };
 
 export const updateHardwareAvailability = async (

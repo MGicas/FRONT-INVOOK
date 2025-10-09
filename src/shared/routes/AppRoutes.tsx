@@ -7,22 +7,10 @@ import HomePage from '../../modules/home/components/HomePage';
 import MainInventory from '../../modules/inventory/components/MainInventory';
 import MainHardware from '../../modules/inventory/components/hardware/MainHardware';
 import MainSupply from '../../modules/inventory/components/supply/MainSupply';
+import { MainResource, MainConsum, MainLoan } from '../../modules/resources/components';
 import MainUsers from '../../modules/users/components/MainUsers';
 import MainMonitor from '../../modules/users/components/monitors/MainMonitor';
 import MainLender from '../../modules/users/components/lenders/MainLender';
-import MainResource from '../../modules/resources/components/MainResource';
-import { RESOURCE_ROUTES } from '../../modules/resources/model/ResourceConstants';
-import MainLoans from '../../modules/resources/components/loans/MainLoans';
-import MainConsum from '../../modules/resources/components/consum/MainConsum';
-
-
-
-const TemporaryPage = ({ title }: { title: string }) => (
-  <div style={{ padding: '20px' }}>
-    <h1>{title}</h1>
-    <p>Esta es una página temporal. Aquí irá el componente {title}.</p>
-  </div>
-);
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth(); 
@@ -101,7 +89,7 @@ export default function AppRoutes() {
         />
         
         <Route
-          path={RESOURCE_ROUTES.MAIN}
+          path="/resources"
           element={
             <ProtectedRoutes isAuthenticated={isAuthenticated}>
               <Navbar />
@@ -113,19 +101,19 @@ export default function AppRoutes() {
         />
         
         <Route
-          path={RESOURCE_ROUTES.LOANS}
+          path="/resources/prestamos"
           element={
             <ProtectedRoutes isAuthenticated={isAuthenticated}>
               <Navbar />
               <main style={{ flex: 1, padding: '1rem' }}>
-                <MainLoans />
+                <MainLoan />
               </main>
             </ProtectedRoutes>
           }
         />
         
         <Route
-          path={RESOURCE_ROUTES.ONE_TIME}
+          path="/resources/consumibles"
           element={
             <ProtectedRoutes isAuthenticated={isAuthenticated}>
               <Navbar />

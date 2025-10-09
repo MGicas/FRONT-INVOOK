@@ -1,5 +1,5 @@
 import React from 'react';
-import { Assignment, Inventory2 } from '@mui/icons-material';
+import { Inventory, Assignment } from '@mui/icons-material';
 import type { Theme } from '@mui/material/styles';
 
 export interface ResourceOption {
@@ -7,43 +7,49 @@ export interface ResourceOption {
   description: string;
   icon: (theme: Theme) => React.ReactElement;
   route: string;
-  color: string;
-  category: 'loans' | 'one_time_items';
+  color?: string;
+  examples?: string[];
+  category: 'consum' | 'loan';
 }
 
 export const getResourceOptions = (): ResourceOption[] => [
   {
-    title: 'Préstamos',
-    description: 'Gestiona préstamos de recursos, fechas de entrega y devolución, y seguimiento de responsables.',
+    title: 'Consumibles',
+    description: 'Gestión de recursos consumibles y materiales',
     icon: (theme: Theme) => (
-      <Assignment sx={{ fontSize: 60, color: theme.palette.primary.main }} />
+      <Inventory
+        sx={{ fontSize: 60, color: theme.palette.primary.main }}
+      />
     ),
-    route: '/resources/prestamos',
-    color: '#388e3c',
-    category: 'loans',
+    route: '/resources/consumibles',
+    category: 'consum',
   },
   {
-    title: 'Artículos de entrega única',
-    description: 'Administra artículos que se entregan una sola vez. Control de stock y registro de entregas.',
+    title: 'Prestamos',
+    description: 'Gestión de préstamos y asignaciones',
     icon: (theme: Theme) => (
-      <Inventory2 sx={{ fontSize: 60, color: theme.palette.secondary.main }} />
+      <Assignment
+        sx={{ fontSize: 60, color: theme.palette.secondary.main }}
+      />
     ),
-    route: '/resources/entrega-unica',
-    color: '#388e3c',
-    category: 'one_time_items',
+    route: '/resources/prestamos',
+    category: 'loan',
   },
 ];
 
 export const ResourceOptionsUtils = {
-  getByCategory: (category: 'loans' | 'one_time_items'): ResourceOption | undefined => {
+  getByCategory: (category: 'consum' | 'loan'): ResourceOption | undefined => {
     return getResourceOptions().find(option => option.category === category);
   },
+
   getAllRoutes: (): string[] => {
     return getResourceOptions().map(option => option.route);
   },
+
   getByRoute: (route: string): ResourceOption | undefined => {
     return getResourceOptions().find(option => option.route === route);
   },
+
   getTitleByRoute: (route: string): string => {
     const option = ResourceOptionsUtils.getByRoute(route);
     return option ? option.title : 'Recursos';

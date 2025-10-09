@@ -39,7 +39,7 @@ const formatActiveStatus = (active: boolean): string => {
 export const LenderTable = ({ lenders, loading, error, onEdit, onDelete }: LenderTableProps) => {
   const tableContent = useMemo(() => {
     const safeLenders = Array.isArray(lenders) ? lenders : [];
-    const totalColumns = 7; // ID, RFID, Nombres, Apellidos, Email, Teléfono, Estado, Acciones
+    const totalColumns = 7;
     
     if (loading) {
       return (

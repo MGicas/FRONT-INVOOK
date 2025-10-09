@@ -175,18 +175,18 @@ export const SupplyRestockDialog = ({
             </Typography>
 
             <TextField
-              label="Cuenta (Count)"
+              label="Cajas"
               type="number"
               value={count}
               onChange={(e) => setCount(Number(e.target.value))}
               disabled={loading}
               slotProps={{ htmlInput: { min: 1 } }}
-              helperText="Número de unidades de cuenta a agregar"
+              helperText="Número de cajas a solicitar"
               fullWidth
             />
 
             <TextField
-              label="Cantidad (Quantity)"
+              label="Unidades"
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}

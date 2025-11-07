@@ -24,7 +24,7 @@ interface LenderEditDialogProps {
   open: boolean;
   lender: Lender | null;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess: (message: string, isError: boolean) => void;
 }
 
 export const LenderEditDialog = ({ open, lender, onClose, onSuccess }: LenderEditDialogProps) => {
@@ -114,7 +114,10 @@ export const LenderEditDialog = ({ open, lender, onClose, onSuccess }: LenderEdi
     if (success) {
       resetForm();
       onClose();
-      onSuccess?.();
+      onSuccess("Prestamista actualizado exitosamente", false);
+    }
+    else {
+      onSuccess("Error al actualizar el prestamista", true);
     }
   }, [lender, getChangedFields, handleUpdateLender, resetForm, onClose, onSuccess]);
 

@@ -19,10 +19,11 @@ import type { CreateLoanRequest } from "../../model/Loan";
 interface CreateLoanDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
-const CreateLoanDialog = ({ open, onClose, onSuccess }: CreateLoanDialogProps) => {
+const CreateLoanDialog = ({ open, onClose, onSuccess, onError }: CreateLoanDialogProps) => {
   const { createLoanMutation, loading, error } = useCreateLoan();
   const [formData, setFormData] = useState<Omit<CreateLoanRequest, 'action'>>({
     id_lender: "",
@@ -35,11 +36,12 @@ const CreateLoanDialog = ({ open, onClose, onSuccess }: CreateLoanDialogProps) =
     e.preventDefault();
     try {
       await createLoanMutation(formData);
-      onSuccess();
+      onSuccess("Préstamo creado correctamente");
       onClose();
       handleReset();
     } catch (error) {
       console.error("Error creating loan:", error);
+      onError("No fue posible crear el préstamo");
     }
   };
 

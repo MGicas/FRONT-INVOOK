@@ -26,7 +26,8 @@ import type { Supply } from "../../model/Supply";
 interface SupplyEditDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: (updatedSupply: Supply) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   supply: Supply | null;
 }
 
@@ -45,7 +46,7 @@ const SUPPLY_TYPES = [
   "Otro",
 ];
 
-export const SupplyEditDialog = ({ open, onClose, onSuccess, supply }: SupplyEditDialogProps) => {
+export const SupplyEditDialog = ({ open, onClose, onSuccess, onError, supply }: SupplyEditDialogProps) => {
   const { loading, error, updateSupply, clearError } = useUpdateSupply();
   
   const [formData, setFormData] = useState<UpdateSupplyRequest>({
@@ -90,8 +91,11 @@ export const SupplyEditDialog = ({ open, onClose, onSuccess, supply }: SupplyEdi
     const result = await updateSupply(supply.code, formData);
     
     if (result) {
-      onSuccess(result);
+      onSuccess("Suministro actualizado correctamente");
       onClose();
+    }
+    else{
+      onError("Error al actualizar el suministro");
     }
   }, [formData, supply, updateSupply, onSuccess, onClose]);
 
@@ -187,23 +191,6 @@ export const SupplyEditDialog = ({ open, onClose, onSuccess, supply }: SupplyEdi
 
             <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
-                label="Conteo (Stock Actual)"
-                type="number"
-                value={formData.count}
-                onChange={handleInputChange("count")}
-                fullWidth
-                required
-                disabled={loading}
-                slotProps={{
-                  htmlInput: { min: 0 }
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& input": { color: "#000" }
-                  }
-                }}
-              />
-              <TextField
                 label="Stock"
                 type="number"
                 value={formData.stock}
@@ -220,29 +207,10 @@ export const SupplyEditDialog = ({ open, onClose, onSuccess, supply }: SupplyEdi
                   }
                 }}
               />
-              <TextField
-                label="Cantidad (Stock Total)"
-                type="number"
-                value={formData.quantity}
-                onChange={handleInputChange("quantity")}
-                fullWidth
-                required
-                disabled={loading}
-                slotProps={{
-                  htmlInput: { min: 1 }
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& input": { color: "#000" }
-                  }
-                }}
-              />
             </Box>
             <Alert severity="info">
               <Typography variant="body2">
-                <strong>Conteo:</strong> Cantidad actual en inventario<br />
                 <strong>Stock:</strong> Cantidad disponible para uso<br />
-                <strong>Cantidad:</strong> Capacidad total de almacenamiento
               </Typography>
             </Alert>
           </Box>

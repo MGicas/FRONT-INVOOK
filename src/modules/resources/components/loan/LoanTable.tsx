@@ -55,6 +55,7 @@ const LoanTable = ({
     const statusConfig = {
       ABIERTO: { color: "warning" as const, label: "Abierto" },
       CERRADO: { color: "success" as const, label: "Cerrado" },
+      VENCIDO: { color: "error" as const, label: "Vencido" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || {
@@ -179,7 +180,7 @@ const LoanTable = ({
               Responsable
             </TableCell>
             <TableCell sx={{ fontWeight: 600, bgcolor: "grey.50" }}>
-              Hardware
+              Equipo
             </TableCell>
             <TableCell sx={{ fontWeight: 600, bgcolor: "grey.50" }}>
               Fecha Inicio
@@ -265,7 +266,7 @@ const LoanTable = ({
                     </Tooltip>
                   )}
                   
-                  {loan.status === "ABIERTO" && onReturnHardware && (
+                  {loan.status === "ABIERTO" || loan.status === "VENCIDO" && onReturnHardware && (
                     <Tooltip title="Devolver hardware">
                       <IconButton
                         onClick={() => onReturnHardware(loan)}
@@ -277,7 +278,7 @@ const LoanTable = ({
                     </Tooltip>
                   )}
                   
-                  {loan.status === "ABIERTO" && onCloseLoan && (
+                  {loan.status === "ABIERTO" || loan.status === "VENCIDO" && onCloseLoan && (
                     <Tooltip title="Cerrar préstamo">
                       <IconButton
                         onClick={() => onCloseLoan(loan)}

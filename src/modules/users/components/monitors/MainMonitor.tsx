@@ -1,7 +1,11 @@
 import {
   Box,
   Container,
+  Alert,
+  Collapse,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from "react-router-dom";
 import { useCallback, useState } from "react";
 import { useGetMonitors } from "../../hook/useGetMonitors";
@@ -38,6 +42,13 @@ const MainMonitor = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedMonitor, setSelectedMonitor] = useState<Monitor | null>(null);
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+  const [globalIsError, setGlobalIsError] = useState<boolean>(false);
+
+  const showMessage = useCallback((message: string, isError: boolean) => {
+    setGlobalMessage(message);
+    setGlobalIsError(isError);
+  }, []);
 
   const handleEdit = useCallback(
     (id: number) => {
@@ -87,17 +98,10 @@ const MainMonitor = () => {
     setSelectedMonitor(null);
   }, []);
 
-  const handleFormSuccess = useCallback(() => {
+  const handleSuccess = useCallback((message: string, isError: boolean) => {
+    showMessage(message, isError);
     refetch();
-  }, [refetch]);
-
-  const handleEditSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  const handleDeleteSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
+  }, [refetch, showMessage]);
 
   const handleSearch = useCallback(
     (searchTerm: string) => {
@@ -117,6 +121,22 @@ const MainMonitor = () => {
   return (
     <Container maxWidth={false} sx={{ maxWidth: "1600px", mx: "auto" }}>
       <Box sx={{ py: 4 }}>
+
+        <Collapse in={!!globalMessage}>
+          {globalMessage && (
+            <Alert
+              severity={globalIsError ? "error" : "success"}
+              sx={{ mb: 2 }}
+              action={
+                <IconButton size="small" onClick={() => setGlobalMessage(null)}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              }
+            >
+              {globalMessage}
+            </Alert>
+          )}
+        </Collapse>
         <Box
           sx={{
             position: "sticky",
@@ -168,21 +188,21 @@ const MainMonitor = () => {
         <MonitorFormDialog
           open={isFormOpen}
           onClose={handleFormClose}
-          onSuccess={handleFormSuccess}
+          onSuccess={handleSuccess}
         />
         
         <MonitorEditDialog
           open={isEditOpen}
           monitor={selectedMonitor}
           onClose={handleEditClose}
-          onSuccess={handleEditSuccess}
+          onSuccess={handleSuccess}
         />
         
         <MonitorDeleteDialog
           open={isDeleteOpen}
           monitor={selectedMonitor}
           onClose={handleDeleteClose}
-          onSuccess={handleDeleteSuccess}
+          onSuccess={handleSuccess}
         />
       </Box>
     </Container>

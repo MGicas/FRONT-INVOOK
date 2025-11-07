@@ -56,8 +56,8 @@ export interface Loan {
   hardwares: LoanHardwareItem[];
 }
 
-export type LoanStatus = 'ABIERTO' | 'CERRADO';
-export type HardwareState = 'BUENO' | 'MALO' | 'FUNCIONAL' | 'DAÑADO' | 'EN_REPARACION';
+export type LoanStatus = 'ABIERTO' | 'CERRADO' | 'VENCIDO';
+export type HardwareState = 'BUENO' | 'FUNCIONAL' | 'DAÑO_LEVE' | 'NO_FUNCIONA' | 'PERDIDO';
 
 export interface CreateLoanRequest {
   action: "create";
@@ -88,7 +88,7 @@ export interface HardwareReturn {
 
 export interface ReturnHardwareRequest {
   action: "return_hardware";
-  monitor_id: string;
+  id_monitor: string;
   serials_hardware: HardwareReturn[];
 }
 

@@ -23,7 +23,8 @@ interface SupplyRestockDialogProps {
   open: boolean;
   supply: Supply | null;
   onClose: () => void;
-  onSuccess: (updatedSupply: Supply) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
 export const SupplyRestockDialog = ({
@@ -31,6 +32,7 @@ export const SupplyRestockDialog = ({
   supply,
   onClose,
   onSuccess,
+  onError,
 }: SupplyRestockDialogProps) => {
   const { loading, error, restockSupply, clearError } = useRestockSupply();
   const [count, setCount] = useState<number | string>(0);
@@ -55,8 +57,11 @@ export const SupplyRestockDialog = ({
     });
 
     if (result) {
-      onSuccess(result);
+      onSuccess("Restock realizados de forma exitosa")
       onClose();
+    }
+    else{
+      onError("Error al realizar el restock")
     }
   }, [supply, count, quantity, restockSupply, onSuccess, onClose]);
 
@@ -192,7 +197,7 @@ export const SupplyRestockDialog = ({
               onChange={(e) => setQuantity(Number(e.target.value))}
               disabled={loading}
               slotProps={{ htmlInput: { min: 1 } }}
-              helperText="Cantidad total a agregar al stock"
+              helperText="Cantidad total a agregar"
               fullWidth
             />
 

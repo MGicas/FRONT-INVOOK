@@ -53,10 +53,6 @@ export const validateSupplyData = (supplyData: CreateSupplyRequest): boolean => 
     throw new Error("La cantidad debe ser un número válido mayor a 0");
   }
 
-  if (supplyData.count > supplyData.quantity) {
-    throw new Error("El conteo no puede ser mayor que la cantidad total");
-  }
-
   return true;
 };
 

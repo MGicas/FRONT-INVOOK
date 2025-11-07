@@ -1,3 +1,11 @@
+export interface Profile {
+  rfid?: string;
+  names?: string;
+  surnames?: string;
+  phone?: string;
+  document_id?: string;
+}
+
 export interface Monitor {
   id: number;
   username: string;
@@ -6,9 +14,5 @@ export interface Monitor {
   last_name: string;
   state: string;
   role: string;
-  profile: string;
-  phone?: string;
-  rfid?: string;
-  names?: string;
-  surnames?: string;
+  profile: Profile;
 }

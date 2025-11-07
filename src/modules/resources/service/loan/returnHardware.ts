@@ -3,13 +3,13 @@ import type { ReturnHardwareRequest, ReturnHardwareResponse, HardwareReturn } fr
 
 export const returnHardware = async (
   loanId: string, 
-  monitor_id: string,
+  id_monitor: string,
   serials_hardware: HardwareReturn[]
 ): Promise<ReturnHardwareResponse> => {
   try {
     const request: ReturnHardwareRequest = {
       action: "return_hardware",
-      monitor_id,
+      id_monitor,
       serials_hardware
     };
 

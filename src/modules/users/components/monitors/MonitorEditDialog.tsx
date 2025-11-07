@@ -28,7 +28,7 @@ interface MonitorEditDialogProps {
   open: boolean;
   monitor: Monitor | null;
   onClose: () => void;
-  onSuccess?: (monitor: Monitor) => void;
+  onSuccess?: (message: string, isError: boolean) => void;
 }
 
 const STATE_OPTIONS = ['ACTIVO', 'INACTIVO', 'SUSPENDIDO'];
@@ -57,8 +57,8 @@ export const MonitorEditDialog = ({ open, monitor, onClose, onSuccess }: Monitor
         surnames: monitor.last_name || '', 
         email: monitor.email || '',
         username: monitor.username || '',
-        phone: monitor.phone || '',
-        rfid: monitor.rfid || '',
+        phone: monitor.profile.phone || '',
+        rfid: monitor.profile.rfid || '',
         state: monitor.state || 'ACTIVO',
       });
     }
@@ -73,8 +73,8 @@ export const MonitorEditDialog = ({ open, monitor, onClose, onSuccess }: Monitor
         surnames: monitor.last_name || '',
         email: monitor.email || '',
         username: monitor.username || '',
-        phone: monitor.phone || '',
-        rfid: monitor.rfid || '',
+        phone: monitor.profile.phone || '',
+        rfid: monitor.profile.rfid || '',
         state: monitor.state || 'ACTIVO',
       });
     }
@@ -122,10 +122,10 @@ export const MonitorEditDialog = ({ open, monitor, onClose, onSuccess }: Monitor
     if (formData.username !== (monitor.username || '')) {
       updatedFields.username = formData.username;
     }
-    if (formData.phone !== (monitor.phone || '')) {
+    if (formData.phone !== (monitor.profile.phone || '')) {
       updatedFields.phone = formData.phone;
     }
-    if (formData.rfid !== (monitor.rfid || '')) {
+    if (formData.rfid !== (monitor.profile.rfid || '')) {
       updatedFields.rfid = formData.rfid;
     }
     if (formData.state !== (monitor.state || 'ACTIVO')) {
@@ -140,8 +140,11 @@ export const MonitorEditDialog = ({ open, monitor, onClose, onSuccess }: Monitor
     const result = await updateMonitor(monitor.id, updatedFields);
     
     if (result && onSuccess) {
-      onSuccess(result);
+      onSuccess("Monitor actualizado correctamente", false);
       onClose();
+    }
+    else if (error && onSuccess) {
+      onSuccess(error, true);
     }
   }, [formData, monitor, updateMonitor, onSuccess, onClose]);
 
@@ -279,9 +282,22 @@ export const MonitorEditDialog = ({ open, monitor, onClose, onSuccess }: Monitor
               />
             </Box>
 
+            <TextField
+                label="Teléfono"
+                value={formData.phone}
+                onChange={handleInputChange('phone')}
+                fullWidth
+                placeholder="Ej: 3007654321"
+                sx={{
+                  '& .MuiInputLabel-root': { color: '#000' },
+                  '& .MuiOutlinedInput-input': { color: '#000' }
+                }}
+              />
+            </Box>
+
             {/* Información adicional */}
             <Typography variant="subtitle1" sx={{ fontWeight: 'medium', color: '#000', mb: 1, mt: 2 }}>
-              Información de Contacto y Estado
+              Información Adicional y Estado
             </Typography>
             
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
@@ -296,18 +312,6 @@ export const MonitorEditDialog = ({ open, monitor, onClose, onSuccess }: Monitor
                   '& .MuiOutlinedInput-input': { color: '#000' }
                 }}
               />
-              <TextField
-                label="Teléfono"
-                value={formData.phone}
-                onChange={handleInputChange('phone')}
-                fullWidth
-                placeholder="Ej: 3007654321"
-                sx={{
-                  '& .MuiInputLabel-root': { color: '#000' },
-                  '& .MuiOutlinedInput-input': { color: '#000' }
-                }}
-              />
-            </Box>
 
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
               <FormControl fullWidth>

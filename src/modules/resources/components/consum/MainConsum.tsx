@@ -17,6 +17,9 @@ const MainConsum = () => {
   const [selectedConsum, setSelectedConsum] = useState<Consum | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+  const [globalIsError, setGlobalIsError] = useState(false);
   const { navigateToMain } = useResourceNavigation();
 
   // Usar el hook para obtener los datos
@@ -44,9 +47,12 @@ const MainConsum = () => {
   const handleAddNew = () => {
     setCreateDialogOpen(true);
   };
-
-  const handleCreateSuccess = () => {
-    refetch(); // Recargar los datos después de crear
+  const handleCreateSuccess = (message: string, isError: boolean) => {
+    setGlobalMessage(message);
+    setGlobalIsError(isError);
+    if (!isError) {
+      refetch(); // Recargar lista si fue éxito
+    }
   };
 
   const handleCloseCreateDialog = () => {
@@ -69,7 +75,11 @@ const MainConsum = () => {
           loading={loading}
         />
 
-        {/* Error Alert */}
+        {globalMessage && (
+          <Alert severity={globalIsError ? "error" : "success"} sx={{ mb: 2 }}>
+            {globalMessage}
+          </Alert>
+        )}
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
@@ -91,15 +101,11 @@ const MainConsum = () => {
             onViewDetails={handleViewDetails}
           />
         </Paper>
-
-        {/* Detail Dialog */}
         <ConsumDetailDialog
           open={detailDialogOpen}
           onClose={handleCloseDetailDialog}
           consum={selectedConsum}
         />
-
-        {/* Create Dialog */}
         <ConsumCreateDialog
           open={createDialogOpen}
           onClose={handleCloseCreateDialog}

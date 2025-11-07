@@ -30,7 +30,8 @@ import type { Loan, HardwareState } from "../../model/Loan";
 interface ReturnHardwareDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   loan: Loan | null;
 }
 
@@ -42,7 +43,7 @@ interface HardwareReturnForm {
   isReturned: boolean;
 }
 
-const ReturnHardwareDialog = ({ open, onClose, onSuccess, loan }: ReturnHardwareDialogProps) => {
+const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: ReturnHardwareDialogProps) => {
   const { returnHardwareMutation, loading, error } = useReturnHardware();
   const [monitorId, setMonitorId] = useState("");
   const [hardwareList, setHardwareList] = useState<HardwareReturnForm[]>([]);
@@ -77,11 +78,12 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, loan }: ReturnHardware
 
     try {
       await returnHardwareMutation(loan.id, monitorId, selectedHardware);
-      onSuccess();
+      onSuccess("Equipo devuelto correctamente");
       onClose();
       handleReset();
     } catch (error) {
-      console.error("Error returning hardware:", error);
+      console.error("Error devolviendo equipo:", error);
+      onError("No fue posible devolver el equipo");
     }
   };
 
@@ -129,9 +131,9 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, loan }: ReturnHardware
   const hardwareStates: { value: HardwareState; label: string; color: string }[] = [
     { value: 'BUENO', label: 'Bueno', color: '#4caf50' },
     { value: 'FUNCIONAL', label: 'Funcional', color: '#2196f3' },
-    { value: 'MALO', label: 'Malo', color: '#f44336' },
-    { value: 'DAÑADO', label: 'Dañado', color: '#ff5722' },
-    { value: 'EN_REPARACION', label: 'En Reparación', color: '#ff9800' },
+    { value: 'DAÑO_LEVE', label: 'Daño leve', color: '#f44336' },
+    { value: 'NO_FUNCIONA', label: 'No funciona', color: '#ff5722' },
+    { value: 'PERDIDO', label: 'Perdido', color: '#ff9800' },
   ];
 
   if (!loan) return null;

@@ -17,9 +17,11 @@ import {
 import { useState, useCallback } from "react";
 import { useDebounce } from "../../hooks/common/useDebounce";
 
+
 interface SupplyHeaderProps {
   onBack: () => void;
   onAddNew: () => void;
+  onAddNewType: () => void; 
   onSearch: (searchTerm: string) => void;
   onClearFilters: () => void;
   totalCount: number;
@@ -28,6 +30,7 @@ interface SupplyHeaderProps {
 export const SupplyHeader = ({
   onBack,
   onAddNew,
+  onAddNewType,
   onSearch,
   onClearFilters,
   totalCount,
@@ -85,16 +88,29 @@ export const SupplyHeader = ({
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={onAddNew}
-          sx={{ borderRadius: 2 }}
-        >
-          Nuevo Suministro
-        </Button>
-      </Box>
+        {/* ✅ Agrupamos los botones a la derecha */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Button 
+            variant="contained" 
+            color="secondary"
+            onClick={onAddNewType}
+            startIcon={<AddIcon />}
+            sx={{ borderRadius: 2 }}
+          >
+            Nuevo Tipo
+          </Button>
 
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<AddIcon />}
+            onClick={onAddNew}
+            sx={{ borderRadius: 2 }}
+          >
+            Nuevo Suministro
+          </Button>
+        </Box>
+      </Box>
       <Toolbar
         sx={{
           bgcolor: "grey.50",
@@ -116,7 +132,7 @@ export const SupplyHeader = ({
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <TextField
             size="small"
-            placeholder="Buscar por nombre o descripción..."
+            placeholder="Buscar por nombre..."
             value={searchTerm}
             onChange={handleSearchChange}
             sx={{

@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material";
+import { Box, Container, Alert  } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCallback, useState } from "react";
 import { useGetHardware } from "../../hooks/hardware/useGetHardware";
@@ -8,17 +8,36 @@ import { HardwareFormDialog } from "./HardwareFormDialog";
 import HardwareEditDialog from "./HardwareEditDialog";
 import HardwareDeactivateDialog from "./HardwareDeactivateDialog";
 import type { Hardware } from "../../model/Hardware";
+import HardwareTypeFormDialog from "./HardwareTypeFormDialog";
+import { useGetHardwareTypes } from '../../hooks/hardwareType/useGetHardwareTypes';
 
 const HardwarePage = () => {
   const navigate = useNavigate();
   const { hardware, loading, error, searchByType, clearFilters, refetch } =
     useGetHardware();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isTypeFormOpen, setIsTypeFormOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeactivateOpen, setIsDeactivateOpen] = useState(false);
   const [selectedHardware, setSelectedHardware] = useState<Hardware | null>(
     null
   );
+
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+  const [globalIsError, setGlobalError] = useState<boolean>(false);
+
+  const { refetch: refetchTypes } = useGetHardwareTypes();
+
+  const handleGlobalSuccess = (message: string) => {
+    setGlobalMessage(message);
+    setGlobalError(false);
+    refetch();
+  };
+
+  const handleGlobalError = (message: string) => {
+    setGlobalMessage(message);
+    setGlobalError(true);
+  };
 
   const handleEdit = useCallback(
     (serial: string) => {
@@ -46,8 +65,16 @@ const HardwarePage = () => {
     setIsFormOpen(true);
   }, []);
 
+  const handleAddNewType = useCallback(() => {
+    setIsTypeFormOpen(true);
+  }, []);
+
   const handleFormClose = useCallback(() => {
     setIsFormOpen(false);
+  }, []);
+
+  const handleTypeFormClose = useCallback(() => {
+    setIsTypeFormOpen(false);
   }, []);
 
   const handleEditClose = useCallback(() => {
@@ -64,13 +91,9 @@ const HardwarePage = () => {
     refetch();
   }, [refetch]);
 
-  const handleEditSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  const handleDeactivateSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
+  const handleTypeFormSuccess = useCallback(() => {
+    refetchTypes();
+  }, [refetchTypes]);
 
   const handleSearch = useCallback(
     (searchTerm: string) => {
@@ -103,12 +126,27 @@ const HardwarePage = () => {
           <HardwareHeader
             onBack={handleBackToInventory}
             onAddNew={handleAddNew}
+            onAddNewType={handleAddNewType}
             onSearch={handleSearch}
             onClearSearch={handleClearSearch}
             totalCount={hardware.length}
           />
         </Box>
-
+        {globalMessage && (
+                      <Alert
+                      severity={globalIsError ? "error" : "success"}
+                            sx={{ mb: 2 }}
+                            onClose={() => setGlobalMessage(null)}
+                          >
+                            {globalMessage}
+                          </Alert>
+                        )}
+                
+                        {error && (
+                          <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                          </Alert>
+                        )}
         <Box
           sx={{
             maxHeight: "600px",
@@ -128,23 +166,31 @@ const HardwarePage = () => {
         </Box>
 
         <HardwareFormDialog
-          open={isFormOpen}
-          onClose={handleFormClose}
-          onSuccess={handleFormSuccess}
+        open={isFormOpen}
+        onClose={handleFormClose}
+        onSuccess={handleFormSuccess}
+      />
+
+        <HardwareTypeFormDialog
+          open={isTypeFormOpen}
+          onClose={handleTypeFormClose}
+          onSuccess={handleTypeFormSuccess}
         />
 
         <HardwareEditDialog
           open={isEditOpen}
           hardware={selectedHardware}
           onClose={handleEditClose}
-          onSuccess={handleEditSuccess}
+          onSuccess={handleGlobalSuccess}
+          onError={handleGlobalError}
         />
 
         <HardwareDeactivateDialog
           open={isDeactivateOpen}
           hardware={selectedHardware}
           onClose={handleDeactivateClose}
-          onSuccess={handleDeactivateSuccess}
+          onSuccess={handleGlobalSuccess}
+          onError={handleGlobalError}
         />
       </Box>
     </Container>

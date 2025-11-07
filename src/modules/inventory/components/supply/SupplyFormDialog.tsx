@@ -18,33 +18,21 @@ import {
   Add as AddIcon,
   Inventory as InventoryIcon,
 } from "@mui/icons-material";
-import { useState, useCallback } from "react";
+import { useState, useCallback} from "react";
 import { useCreateSupply } from "../../hooks/supply/useCreateSupply";
 import type { CreateSupplyRequest } from "../../service/supply/postSupply";
-import type { Supply } from "../../model/Supply";
+import type { SupplyType } from "../../model/SupplyType";
 
 interface SupplyFormDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: (newSupply: Supply) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
+  supplyTypes: SupplyType[];
+  loadingTypes: boolean;
 }
 
-const SUPPLY_TYPES = [
-  "Resistencia",
-  "Capacitor",
-  "Transistor",
-  "Diodo",
-  "Circuito Integrado",
-  "Cable",
-  "Conector",
-  "Herramienta",
-  "Equipo",
-  "Material",
-  "Consumible",
-  "Otro",
-];
-
-export const SupplyFormDialog = ({ open, onClose, onSuccess }: SupplyFormDialogProps) => {
+export const SupplyFormDialog = ({ open, onClose, onSuccess, onError, supplyTypes, loadingTypes }: SupplyFormDialogProps) => {
   const { loading, error, createSupply, clearError } = useCreateSupply();
   
   const [formData, setFormData] = useState<CreateSupplyRequest>({
@@ -73,7 +61,7 @@ export const SupplyFormDialog = ({ open, onClose, onSuccess }: SupplyFormDialogP
     const result = await createSupply(formData);
     
     if (result) {
-      onSuccess(result);
+      onSuccess("Suministro creado correctamente");
       onClose();
       setFormData({
         code: "",
@@ -83,6 +71,9 @@ export const SupplyFormDialog = ({ open, onClose, onSuccess }: SupplyFormDialogP
         count: "",
         quantity: "",
       });
+    }
+    else{
+      onError("Error al crear el suministro");
     }
   }, [formData, createSupply, onSuccess, onClose]);
 
@@ -188,25 +179,33 @@ export const SupplyFormDialog = ({ open, onClose, onSuccess }: SupplyFormDialogP
                 }
               }}
             />
-            <FormControl fullWidth required disabled={loading}>
-              <InputLabel>Tipo de Suministro</InputLabel>
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="supply-type-label">Tipo de Insumo</InputLabel>
               <Select
+                labelId="supply-type-label"
+                id="supply_type"
+                name="supply_type"
                 value={formData.supply_type}
-                label="Tipo de Suministro"
-                onChange={handleInputChange("supply_type")}
-                sx={{ color: "#000" }}
+                onChange={handleInputChange('supply_type')}
+                label="Tipo de Insumo"
+                required
+                disabled={loadingTypes}
               >
-                {SUPPLY_TYPES.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
+                {loadingTypes ? (
+                  <MenuItem disabled>Cargando tipos...</MenuItem>
+                ) : (
+                  supplyTypes.map((type) => (
+                    <MenuItem key={type.id} value={type.id}>
+                      {type.name}
+                    </MenuItem>
+                  ))
+                )}
               </Select>
             </FormControl>
 
             <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
-                label="Conteo (Stock Actual)"
+                label="Conteo (Cantidad de cajas)"
                 type="number"
                 value={formData.count}
                 onChange={handleInputChange("count")}
@@ -220,7 +219,7 @@ export const SupplyFormDialog = ({ open, onClose, onSuccess }: SupplyFormDialogP
                 }}
               />
               <TextField
-                label="Cantidad (Stock Total)"
+                label="Cantidad (Unidades por caja)"
                 type="number"
                 value={formData.quantity}
                 onChange={handleInputChange("quantity")}
@@ -236,8 +235,8 @@ export const SupplyFormDialog = ({ open, onClose, onSuccess }: SupplyFormDialogP
             </Box>
             <Alert severity="info">
               <Typography variant="body2">
-                <strong>Conteo:</strong> Cantidad actual en stock<br />
-                <strong>Cantidad:</strong> Capacidad total de almacenamiento
+                <strong>Conteo:</strong> Cantidad de cajas para inventario<br />
+                <strong>Cantidad:</strong> Cantidad de unidades por caja
               </Typography>
             </Alert>
           </Box>

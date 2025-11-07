@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import {
   Edit as EditIcon,
-  Delete as DeleteIcon,
   Warning as WarningIcon,
   Inventory as InventoryIcon,
 } from "@mui/icons-material";
@@ -27,7 +26,6 @@ interface SupplyTableProps {
   loading: boolean;
   error: string | null;
   onEdit: (codigo: string) => void;
-  onDelete: (codigo: string) => void;
   onRestock: (codigo: string) => void;
 }
 
@@ -52,12 +50,12 @@ const formatNumber = (num: number): string => {
   return new Intl.NumberFormat("es-CO").format(num);
 };
 
-export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRestock }: SupplyTableProps) => {
+export const SupplyTable = ({ supplies, loading, error, onEdit, onRestock }: SupplyTableProps) => {
   const tableContent = useMemo(() => {
     if (loading) {
       return (
         <TableRow>
-          <TableCell colSpan={8} sx={{ textAlign: "center", py: 4 }}>
+          <TableCell colSpan={5} sx={{ textAlign: "center", py: 4 }}>
             <CircularProgress size={24} />
             <Typography variant="body2" sx={{ mt: 1, color: "#000" }}>
               Cargando suministros...
@@ -70,7 +68,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
     if (error) {
       return (
         <TableRow>
-          <TableCell colSpan={8} sx={{ textAlign: "center", py: 4 }}>
+          <TableCell colSpan={5} sx={{ textAlign: "center", py: 4 }}>
             <Alert severity="error" sx={{ justifyContent: "center" }}>
               {error}
             </Alert>
@@ -82,7 +80,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
     if (supplies.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={8} sx={{ textAlign: "center", py: 4 }}>
+          <TableCell colSpan={5} sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="body2" sx={{ color: "#000" }}>
               No hay suministros registrados
             </Typography>
@@ -101,15 +99,14 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
         }}
       >
         <TableCell sx={{ 
-          fontFamily: "monospace", 
-          fontSize: "0.875rem", 
+          fontWeight: "medium", 
           color: "#000",
-          width: "18%",
-          wordBreak: "break-all"
+          width: "25%",
+          wordBreak: "break-word"
         }}>
-          {supply.code}
+          {supply.name}
         </TableCell>
-        <TableCell sx={{ width: "12%" }}>
+        <TableCell sx={{ width: "15%" }}>
           <Chip
             label={supply.supply_type}
             size="small"
@@ -123,18 +120,11 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
             }}
           />
         </TableCell>
-        <TableCell sx={{ 
-          fontWeight: "medium", 
-          color: "#000",
-          width: "16%",
-          wordBreak: "break-word"
-        }}>
-          {supply.name}
-        </TableCell>
+        
         <TableCell sx={{ 
           color: "#000", 
           fontSize: "0.875rem", 
-          width: "28%"
+          width: "40%"
         }}>
           <Typography variant="body2" sx={{ 
             color: "#000",
@@ -144,19 +134,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
             {supply.description}
           </Typography>
         </TableCell>
-        <TableCell sx={{ width: "8%" }}>
-          <Chip
-            label={supply.count}
-            size="small"
-            variant="outlined"
-            sx={{
-              borderRadius: 1,
-              color: "#000",
-              borderColor: "#000",
-            }}
-          />
-        </TableCell>
-        <TableCell sx={{ textAlign: "right", width: "10%" }}>
+        <TableCell sx={{ textAlign: "right", width: "20%" }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 1 }}>
             {getStockIcon(supply.stock, supply.quantity)}
             <Chip
@@ -167,12 +145,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
             />
           </Box>
         </TableCell>
-        <TableCell sx={{ textAlign: "right", width: "8%" }}>
-          <Typography variant="body2" sx={{ fontWeight: "medium", color: "#000" }}>
-            {formatNumber(supply.quantity)}
-          </Typography>
-        </TableCell>
-        <TableCell sx={{ textAlign: "center", width: "auto" }}>
+        <TableCell sx={{ textAlign: "center", width: "10%" }}>
           <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
             <IconButton
               size="small"
@@ -189,18 +162,11 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
             >
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => onDelete(supply.code)}
-              sx={{ color: "error.main" }}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
           </Box>
         </TableCell>
       </TableRow>
     ));
-  }, [supplies, loading, error, onEdit, onDelete, onRestock]);
+  }, [supplies, loading, error, onEdit, onRestock]);
 
   return (
     <TableContainer
@@ -233,31 +199,7 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
                 color: "#000",
                 backgroundColor: "grey.100",
                 borderBottom: "2px solid #e0e0e0",
-                width: "18%",
-              }}
-            >
-              Código
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                fontSize: "0.875rem",
-                color: "#000",
-                backgroundColor: "grey.100",
-                borderBottom: "2px solid #e0e0e0",
-                width: "12%",
-              }}
-            >
-              Tipo
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                fontSize: "0.875rem",
-                color: "#000",
-                backgroundColor: "grey.100",
-                borderBottom: "2px solid #e0e0e0",
-                width: "16%",
+                width: "20%",
               }}
             >
               Nombre
@@ -269,7 +211,19 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
                 color: "#000",
                 backgroundColor: "grey.100",
                 borderBottom: "2px solid #e0e0e0",
-                width: "28%",
+                width: "15%",
+              }}
+            >
+              Tipo
+            </TableCell>
+            <TableCell
+              sx={{
+                fontWeight: "bold",
+                fontSize: "0.875rem",
+                color: "#000",
+                backgroundColor: "grey.100",
+                borderBottom: "2px solid #e0e0e0",
+                width: "50%",
               }}
             >
               Descripción
@@ -279,38 +233,13 @@ export const SupplyTable = ({ supplies, loading, error, onEdit, onDelete, onRest
                 fontWeight: "bold",
                 fontSize: "0.875rem",
                 color: "#000",
-                backgroundColor: "grey.100",
-                borderBottom: "2px solid #e0e0e0",
-                width: "8%",
-              }}
-            >
-              Caja(s)
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                fontSize: "0.875rem",
-                color: "#000",
                 textAlign: "right",
                 backgroundColor: "grey.100",
                 borderBottom: "2px solid #e0e0e0",
-                width: "10%",
+                width: "20%",
               }}
             >
               Stock
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                fontSize: "0.875rem",
-                color: "#000",
-                textAlign: "right",
-                backgroundColor: "grey.100",
-                borderBottom: "2px solid #e0e0e0",
-                width: "8%",
-              }}
-            >
-              Unidades
             </TableCell>
             <TableCell
               sx={{

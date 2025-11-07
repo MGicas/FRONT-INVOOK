@@ -22,7 +22,7 @@ import type { CreateLenderRequest } from '../../service/postLender';
 interface LenderFormDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess: (message: string, isError: boolean) => void;
 }
 
 export const LenderFormDialog = ({ open, onClose, onSuccess }: LenderFormDialogProps) => {
@@ -65,7 +65,10 @@ export const LenderFormDialog = ({ open, onClose, onSuccess }: LenderFormDialogP
     if (success) {
       resetForm();
       onClose();
-      onSuccess?.();
+      onSuccess("Prestamista creado exitosamente", false);
+    }
+    else {
+      onSuccess("Error al crear el prestamista", true);
     }
   }, [formData, handleCreateLender, resetForm, onClose, onSuccess]);
 
@@ -174,6 +177,20 @@ export const LenderFormDialog = ({ open, onClose, onSuccess }: LenderFormDialogP
                 '& .MuiOutlinedInput-input': { color: '#000' }
               }}
             />
+
+            <TextField
+                label="Teléfono"
+                value={formData.phone}
+                onChange={handleInputChange('phone')}
+                fullWidth
+                required
+                placeholder="Ej: 3214567890"
+                sx={{
+                  '& .MuiInputLabel-root': { color: '#000' },
+                  '& .MuiOutlinedInput-input': { color: '#000' }
+                }}
+              />
+              
             <Typography variant="subtitle1" sx={{ fontWeight: 'medium', color: '#000', mb: 1, mt: 2 }}>
               Información Adicional
             </Typography>
@@ -185,17 +202,6 @@ export const LenderFormDialog = ({ open, onClose, onSuccess }: LenderFormDialogP
                 onChange={handleInputChange('rfid')}
                 fullWidth
                 placeholder="Ej: RFID-12345"
-                sx={{
-                  '& .MuiInputLabel-root': { color: '#000' },
-                  '& .MuiOutlinedInput-input': { color: '#000' }
-                }}
-              />
-              <TextField
-                label="Teléfono (Opcional)"
-                value={formData.phone}
-                onChange={handleInputChange('phone')}
-                fullWidth
-                placeholder="Ej: 3214567890"
                 sx={{
                   '& .MuiInputLabel-root': { color: '#000' },
                   '& .MuiOutlinedInput-input': { color: '#000' }

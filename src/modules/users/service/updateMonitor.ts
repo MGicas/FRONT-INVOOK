@@ -14,7 +14,7 @@ export interface UpdateMonitorRequest {
 }
 
 export const updateMonitor = async (id: number, data: UpdateMonitorRequest): Promise<Monitor> => {
-  const response = await apiService.patch<Monitor>(`users/admins/profile/${id}`, data);
+  const response = await apiService.patch<Monitor>(`users/admins/${id}/profile/`, data);
   return response;
 };
 

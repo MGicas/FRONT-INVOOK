@@ -3,7 +3,7 @@ import { returnHardware } from '../service/loan/returnHardware';
 import type { ReturnHardwareResponse, HardwareReturn } from '../model/Loan';
 
 interface UseReturnHardwareReturn {
-  returnHardwareMutation: (loanId: string, monitor_id: string, hardware: HardwareReturn[]) => Promise<ReturnHardwareResponse>;
+  returnHardwareMutation: (loanId: string, id_monitor: string, hardware: HardwareReturn[]) => Promise<ReturnHardwareResponse>;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -16,7 +16,7 @@ export const useReturnHardware = (): UseReturnHardwareReturn => {
 
   const returnHardwareMutation = async (
     loanId: string, 
-    monitor_id: string, 
+    id_monitor: string, 
     hardware: HardwareReturn[]
   ): Promise<ReturnHardwareResponse> => {
     try {
@@ -24,7 +24,7 @@ export const useReturnHardware = (): UseReturnHardwareReturn => {
       setError(null);
       setSuccess(false);
       
-      const result = await returnHardware(loanId, monitor_id, hardware);
+      const result = await returnHardware(loanId, id_monitor, hardware);
       setSuccess(true);
       return result;
     } catch (err) {

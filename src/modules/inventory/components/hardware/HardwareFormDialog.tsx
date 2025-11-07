@@ -23,6 +23,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useCreateHardware } from '../../hooks/hardware/useCreateHardware';
 import { STATE_OPTIONS, AVAILABILITY_OPTIONS, type Hardware } from '../../model/Hardware';
 import type { CreateHardwareRequest } from '../../service/hardware/postHardware';
+import { useGetHardwareTypes } from '../../hooks/hardwareType/useGetHardwareTypes';
 
 interface HardwareFormDialogProps {
   open: boolean;
@@ -32,6 +33,7 @@ interface HardwareFormDialogProps {
 
 export const HardwareFormDialog = ({ open, onClose, onSuccess }: HardwareFormDialogProps) => {
   const { createHardware, loading, error, clearState } = useCreateHardware();
+  const { types, loading: typesLoading, error: typesError } = useGetHardwareTypes();
   
   const [formData, setFormData] = useState({
     serial: '',
@@ -118,7 +120,7 @@ export const HardwareFormDialog = ({ open, onClose, onSuccess }: HardwareFormDia
         pb: 1 
       }}>
         <Typography variant="h6" sx={{ color: '#000', fontWeight: 'bold' }}>
-          Crear Nuevo Hardware
+          Crear Nuevo Equipo
         </Typography>
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
@@ -130,6 +132,11 @@ export const HardwareFormDialog = ({ open, onClose, onSuccess }: HardwareFormDia
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
+            </Alert>
+          )}
+          {typesError && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              {typesError}
             </Alert>
           )}
 
@@ -152,7 +159,7 @@ export const HardwareFormDialog = ({ open, onClose, onSuccess }: HardwareFormDia
               onChange={handleInputChange('name')}
               fullWidth
               required
-              placeholder="Ej: Laptop Dell XPS"
+              placeholder="Ej: laptop Dell XPS"
               sx={{
                 '& .MuiInputLabel-root': { color: '#000' },
                 '& .MuiOutlinedInput-input': { color: '#000' }
@@ -172,18 +179,27 @@ export const HardwareFormDialog = ({ open, onClose, onSuccess }: HardwareFormDia
                 '& .MuiOutlinedInput-input': { color: '#000' }
               }}
             />
-            <TextField
-              label="Tipo de Hardware"
-              value={formData.hardware_type}
-              onChange={handleInputChange('hardware_type')}
-              fullWidth
-              required
-              placeholder="Ej: Laptop, Desktop, Router, Proyector"
-              sx={{
-                '& .MuiInputLabel-root': { color: '#000' },
-                '& .MuiOutlinedInput-input': { color: '#000' }
-              }}
-            />
+            <FormControl fullWidth required>
+              <InputLabel sx={{ color: '#000' }}>Tipo de Equipo</InputLabel>
+              <Select
+                value={formData.hardware_type}
+                onChange={(e) => handleSelectChange('hardware_type', e.target.value)}
+                label="Tipo de Hardware *"
+                disabled={typesLoading}
+                sx={{ '& .MuiSelect-select': { color: '#000' } }}
+              >
+                {typesLoading && (
+                  <MenuItem disabled value="">
+                    Cargando tipos...
+                  </MenuItem>
+                )}
+                {!typesLoading && types.map((t) => (
+                  <MenuItem key={t.id} value={t.name}>
+                    {t.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl fullWidth required>
               <InputLabel sx={{ color: '#000' }}>Estado</InputLabel>
               <Select

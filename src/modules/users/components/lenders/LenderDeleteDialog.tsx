@@ -23,7 +23,7 @@ interface LenderDeleteDialogProps {
   open: boolean;
   lender: Lender | null;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess: (message: string, isError: boolean) => void;
 }
 
 export const LenderDeleteDialog = ({ open, lender, onClose, onSuccess }: LenderDeleteDialogProps) => {
@@ -38,7 +38,10 @@ export const LenderDeleteDialog = ({ open, lender, onClose, onSuccess }: LenderD
     
     if (success) {
       onClose();
-      onSuccess?.();
+      onSuccess("Prestamista eliminado exitosamente", false);
+    }
+    else {
+      onSuccess("Error al eliminar el prestamista", true);
     }
   }, [lender, handleDeleteLender, onClose, onSuccess]);
 

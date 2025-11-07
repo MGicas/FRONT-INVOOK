@@ -22,7 +22,8 @@ interface HardwareDeactivateDialogProps {
   open: boolean;
   hardware: Hardware | null;
   onClose: () => void;
-  onSuccess: (deactivatedHardware: Hardware) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
 export const HardwareDeactivateDialog = ({
@@ -30,6 +31,7 @@ export const HardwareDeactivateDialog = ({
   hardware,
   onClose,
   onSuccess,
+  onError,
 }: HardwareDeactivateDialogProps) => {
   const { loading, error, deactivateHardware, clearError } =
     useDeactivateHardware();
@@ -42,8 +44,11 @@ export const HardwareDeactivateDialog = ({
     const result = await deactivateHardware(hardware.serial);
 
     if (result) {
-      onSuccess(result);
+      onSuccess("Equipo desactivado correctamente")
       onClose();
+    }
+    else{
+      onError("Error al desactivar el equipo")
     }
   }, [hardware, deactivateHardware, onSuccess, onClose]);
 
@@ -86,7 +91,7 @@ export const HardwareDeactivateDialog = ({
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Typography variant="body1" sx={{ color: "#000" }}>
-            ¿Está seguro que desea eliminar el siguiente hardware?
+            ¿Está seguro que desea eliminar el siguiente equipo?
           </Typography>
 
           <Box
@@ -102,7 +107,7 @@ export const HardwareDeactivateDialog = ({
               variant="subtitle2"
               sx={{ fontWeight: "bold", mb: 1, color: "#000" }}
             >
-              Información del Hardware:
+              Información del Equipo:
             </Typography>
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -134,7 +139,7 @@ export const HardwareDeactivateDialog = ({
 
           <Alert severity="warning" sx={{ mt: 2 }}>
             <Typography variant="body2">
-              <strong>Advertencia:</strong> Esta acción eliminará el hardware
+              <strong>Advertencia:</strong> Esta acción eliminará el equipo
               del sistema. Asegúrese de que realmente desea proceder con esta
               operación.
             </Typography>

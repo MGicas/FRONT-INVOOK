@@ -1,6 +1,7 @@
 import {
   Box,
   Container,
+  Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCallback, useState } from "react";
@@ -9,12 +10,41 @@ import SupplyHeader from "./SupplyHeader";
 import SupplyTable from "./SupplyTable";
 import SupplyFormDialog from "./SupplyFormDialog";
 import SupplyEditDialog from "./SupplyEditDialog";
-import SupplyDeleteDialog from "./SupplyDeleteDialog";
 import SupplyRestockDialog from "./SupplyRestockDialog";
 import type { Supply } from "../../model/Supply";
+import { useGetSupplyTypes } from '../../hooks/supplyType/useGetSupplyTypes';
+import { SupplyTypeFormDialog } from './SupplyTypeFormDialog';
+
 
 const MainSupply = () => {
   const navigate = useNavigate();
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isRestockOpen, setIsRestockOpen] = useState(false);
+  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
+  const [isTypeFormOpen, setIsTypeFormOpen] = useState(false);
+
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+  const [globalIsError, setGlobalError] = useState<boolean>(false);
+
+  const handleGlobalSuccess = (message: string) => {
+    setGlobalMessage(message);
+    setGlobalError(false);
+    refetch();
+  };
+
+  const handleGlobalError = (message: string) => {
+    setGlobalMessage(message);
+    setGlobalError(true);
+  };
+
+  const { 
+    types: supplyTypes = [], 
+    loading: loadingTypes,
+    refetch: refetchTypes 
+  } = useGetSupplyTypes();
+
   const { 
     supplies, 
     loading, 
@@ -24,11 +54,18 @@ const MainSupply = () => {
     refetch 
   } = useGetSupplies();
   
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isRestockOpen, setIsRestockOpen] = useState(false);
-  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
+  const handleAddNewType = useCallback(() => {
+    setIsTypeFormOpen(true);
+  }, []);
+
+  const handleTypeFormClose = useCallback(() => {
+    setIsTypeFormOpen(false);
+  }, []);
+
+  const handleTypeFormSuccess = useCallback(() => {
+    void refetchTypes();
+    // Aquí podrías mostrar un mensaje de éxito
+  }, [refetchTypes]);
 
   const handleEdit = useCallback(
     (code: string) => {
@@ -36,19 +73,6 @@ const MainSupply = () => {
       if (supplyToEdit) {
         setSelectedSupply(supplyToEdit);
         setIsEditOpen(true);
-      } else {
-        console.error("Suministro no encontrado:", code);
-      }
-    },
-    [supplies]
-  );
-
-  const handleDelete = useCallback(
-    (code: string) => {
-      const supplyToDelete = supplies.find((supply) => supply.code === code);
-      if (supplyToDelete) {
-        setSelectedSupply(supplyToDelete);
-        setIsDeleteOpen(true);
       } else {
         console.error("Suministro no encontrado:", code);
       }
@@ -70,6 +94,7 @@ const MainSupply = () => {
   );
 
   const handleAddNew = useCallback(() => {
+    setSelectedSupply(null);
     setIsFormOpen(true);
   }, []);
 
@@ -82,27 +107,10 @@ const MainSupply = () => {
     setSelectedSupply(null);
   }, []);
 
-  const handleDeleteClose = useCallback(() => {
-    setIsDeleteOpen(false);
-    setSelectedSupply(null);
-  }, []);
-
   const handleRestockClose = useCallback(() => {
     setIsRestockOpen(false);
     setSelectedSupply(null);
   }, []);
-
-  const handleFormSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  const handleEditSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  const handleDeleteSuccess = useCallback(() => {
-    refetch();
-  }, [refetch]);
 
   const handleRestockSuccess = useCallback(() => {
     refetch();
@@ -136,13 +144,6 @@ const MainSupply = () => {
             mb: 2,
           }}
         >
-          <SupplyHeader
-            onBack={handleBackToInventory}
-            onAddNew={handleAddNew}
-            onSearch={handleSearch}
-            onClearFilters={handleClearFilters}
-            totalCount={supplies.length}
-          />
         </Box>
         <Box
           sx={{
@@ -154,37 +155,65 @@ const MainSupply = () => {
             width: "100%",
           }}
         >
+          <SupplyHeader 
+            onAddNew={handleAddNew}
+            onAddNewType={handleAddNewType}
+            onBack={handleBackToInventory}
+            onSearch={handleSearch}
+            onClearFilters={handleClearFilters}
+            totalCount={supplies.length}
+      />
+
+          {globalMessage && (
+            <Alert
+            severity={globalIsError ? "error" : "success"}
+                  sx={{ mb: 2 }}
+                  onClose={() => setGlobalMessage(null)}
+                >
+                  {globalMessage}
+                </Alert>
+              )}
+      
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
           <SupplyTable
             supplies={supplies}
             loading={loading}
             error={error}
             onEdit={handleEdit}
-            onDelete={handleDelete}
             onRestock={handleRestock}
           />
-        </Box>
-        <SupplyFormDialog
-          open={isFormOpen}
-          onClose={handleFormClose}
-          onSuccess={handleFormSuccess}
-        />
-        <SupplyEditDialog
-          open={isEditOpen}
-          onClose={handleEditClose}
-          onSuccess={handleEditSuccess}
-          supply={selectedSupply}
-        />
-        <SupplyDeleteDialog
-          open={isDeleteOpen}
-          onClose={handleDeleteClose}
-          onSuccess={handleDeleteSuccess}
-          supply={selectedSupply}
-        />
-        <SupplyRestockDialog
-          open={isRestockOpen}
-          onClose={handleRestockClose}
-          onSuccess={handleRestockSuccess}
-          supply={selectedSupply}
+          </Box>
+          <SupplyFormDialog
+            open={isFormOpen}
+            onClose={handleFormClose}
+            onSuccess={handleGlobalSuccess}
+            onError={handleGlobalError}
+            supplyTypes={supplyTypes}
+            loadingTypes={loadingTypes}
+          />
+          <SupplyEditDialog
+            open={isEditOpen}
+            onClose={handleEditClose}
+            onSuccess={handleGlobalSuccess}
+            onError={handleGlobalError}
+            supply={selectedSupply}
+          />
+
+          <SupplyTypeFormDialog
+            open={isTypeFormOpen}
+            onClose={handleTypeFormClose}
+            onSuccess={handleTypeFormSuccess}
+          />
+          <SupplyRestockDialog
+            open={isRestockOpen}
+            onClose={handleRestockClose}
+            onSuccess={handleGlobalSuccess}
+            onError={handleGlobalError}
+            supply={selectedSupply}
         />
       </Box>
     </Container>

@@ -19,11 +19,12 @@ import type { Loan } from "../../model/Loan";
 interface AddHardwareDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
   loan: Loan | null;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
-const AddHardwareDialog = ({ open, onClose, onSuccess, loan }: AddHardwareDialogProps) => {
+const AddHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: AddHardwareDialogProps) => {
   const { addHardwareMutation, loading, error } = useAddHardware();
   const [serials, setSerials] = useState<string[]>([]);
   const [newSerial, setNewSerial] = useState("");
@@ -34,11 +35,12 @@ const AddHardwareDialog = ({ open, onClose, onSuccess, loan }: AddHardwareDialog
 
     try {
       await addHardwareMutation(loan.id, serials);
-      onSuccess();
+      onSuccess("Equipo agregado correctamente");
       onClose();
       handleReset();
     } catch (error) {
-      console.error("Error adding hardware:", error);
+      console.error("Error al agregar el equipo:", error);
+      onError("No fue posible agregar el equipo");
     }
   };
 

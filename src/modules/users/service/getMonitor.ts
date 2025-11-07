@@ -62,7 +62,7 @@ export const searchMonitors = async (
   }
 
   const response = await apiService.get<PaginatedResponse<Monitor>>(
-    `users/admins/?names=${encodeURIComponent(searchTerm)}&page=${page}`
+    `users/admins/?search=${encodeURIComponent(searchTerm)}&page=${page}`
   );
   
   const nextPage = response.next ? extractPageFromUrl(response.next) : null;

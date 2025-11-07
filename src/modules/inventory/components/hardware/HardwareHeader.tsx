@@ -20,12 +20,13 @@ import { useDebounce } from '../../hooks/common/useDebounce';
 interface HardwareHeaderProps {
   onBack: () => void;
   onAddNew: () => void;
+  onAddNewType: () => void;
   onSearch: (searchTerm: string) => void;
   onClearSearch: () => void;
   totalCount: number;
 }
 
-export const HardwareHeader = ({ onBack, onAddNew, onSearch, onClearSearch, totalCount }: HardwareHeaderProps) => {
+export const HardwareHeader = ({ onBack, onAddNew, onAddNewType, onSearch, onClearSearch, totalCount }: HardwareHeaderProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const { debounce } = useDebounce();
 
@@ -64,14 +65,24 @@ export const HardwareHeader = ({ onBack, onAddNew, onSearch, onClearSearch, tota
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={onAddNew}
-          sx={{ borderRadius: 2 }}
-        >
-          Nuevo Equipo
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={onAddNewType}
+            sx={{ borderRadius: 2 }}
+          >
+            Nuevo Tipo
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={onAddNew}
+            sx={{ borderRadius: 2 }}
+          >
+            Nuevo Equipo
+          </Button>
+        </Box>
       </Box>
       <Toolbar sx={{ 
         bgcolor: 'grey.50', 
@@ -88,7 +99,7 @@ export const HardwareHeader = ({ onBack, onAddNew, onSearch, onClearSearch, tota
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <TextField
             size="small"
-            placeholder="Buscar por tipo de hardware..."
+            placeholder="Buscar por tipo de equipo..."
             value={searchTerm}
             onChange={handleSearchChange}
             sx={{ 

@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Container,
 } from "@mui/material";
@@ -36,6 +37,17 @@ const MainLender = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedLender, setSelectedLender] = useState<Lender | null>(null);
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+  const [globalIsError, setGlobalIsError] = useState<boolean>(false);
+
+  const showMessage = useCallback((msg: string, isError = false) => {
+    setGlobalMessage(msg);
+    setGlobalIsError(isError);
+    setTimeout(() => {
+      setGlobalMessage(null);
+    }, 3500);
+  }, []);
+
 
   const handleEdit = useCallback((id: string) => {
     const lenderToEdit = lenders.find((lender) => lender.id === id);
@@ -58,9 +70,10 @@ const MainLender = () => {
     setSelectedLender(null);
   }, []);
 
-  const handleDeleteSuccess = useCallback(() => {
+  const handleDeleteSuccess = useCallback((msg: string, isError: boolean) => {
+    showMessage(msg, isError);
     refetch();
-  }, [refetch]);
+  }, [refetch, showMessage]);
 
   const handleAddNew = useCallback(() => {
     setIsFormOpen(true);
@@ -75,13 +88,16 @@ const MainLender = () => {
     setSelectedLender(null);
   }, []);
 
-  const handleFormSuccess = useCallback(async () => {
+  const handleFormSuccess = useCallback(async (msg: string, isError: boolean) => {
+    showMessage(msg, isError);
     await refetch();
-  }, [refetch]);
+  }, [refetch, showMessage]);
 
-  const handleEditSuccess = useCallback(async () => {
+
+  const handleEditSuccess = useCallback(async (msg: string, isError: boolean) => {
+    showMessage(msg, isError);
     await refetch();
-  }, [refetch]);
+  }, [refetch, showMessage]);
 
   const handleSearch = useCallback(
     (searchTerm: string) => {
@@ -111,6 +127,15 @@ const MainLender = () => {
             mb: 2,
           }}
         >
+
+          {globalMessage && (
+            <Box sx={{ mb: 2 }}>
+              <Alert severity={globalIsError ? "error" : "success"}>
+                {globalMessage}
+              </Alert>
+            </Box>
+          )}
+
           <LenderHeader
             onBack={handleBackToUsers}
             onAddNew={handleAddNew}

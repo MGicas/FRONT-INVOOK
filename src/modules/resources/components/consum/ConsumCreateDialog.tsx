@@ -31,10 +31,10 @@ interface Supply {
 interface ConsumCreateDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (msg: string, isError: boolean) => void;
 }
 
-export const ConsumCreateDialog = ({ open, onClose, onSuccess }: ConsumCreateDialogProps) => {
+export const ConsumCreateDialog = ({ open, onClose, onSuccess}: ConsumCreateDialogProps) => {
   const [idLender, setIdLender] = useState("");
   const [idMonitor, setIdMonitor] = useState("");
   const [supplies, setSupplies] = useState<Supply[]>([{ 
@@ -91,7 +91,10 @@ export const ConsumCreateDialog = ({ open, onClose, onSuccess }: ConsumCreateDia
     const result = await createConsum(data);
     if (result) {
       handleClose();
-      onSuccess();
+      onSuccess("Consumo creado exitosamente", false);
+    }
+    else {
+      onSuccess("Error al crear el consumo", true);
     }
   };
 

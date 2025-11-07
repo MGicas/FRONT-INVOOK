@@ -22,12 +22,11 @@ import {
 import { useState, useCallback, useEffect } from 'react';
 import { useMonitorMutations } from '../../hook/useMonitorMutations';
 import type { CreateMonitorRequest } from '../../service/postMonitor';
-import type { Monitor } from '../../model/Monitor';
 
 interface MonitorFormDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: (monitor: Monitor) => void;
+  onSuccess?: (message: string, isError: boolean) => void;
 }
 
 const ROLE_OPTIONS = ['ADMIN', 'MONITOR'];
@@ -92,7 +91,7 @@ export const MonitorFormDialog = ({ open, onClose, onSuccess }: MonitorFormDialo
     const result = await createMonitor(monitorData);
     
     if (result && onSuccess) {
-      onSuccess(result);
+      onSuccess("Monitor creado correctamente", false);
       resetForm();
       onClose();
     }
@@ -250,6 +249,34 @@ export const MonitorFormDialog = ({ open, onClose, onSuccess }: MonitorFormDialo
               />
             </Box>
 
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              <TextField
+                label="Número de Documento"
+                value={formData.document_id}
+                onChange={handleInputChange('document_id')}
+                fullWidth
+                required
+                placeholder="Ej: 100200300"
+                sx={{
+                  '& .MuiInputLabel-root': { color: '#000' },
+                  '& .MuiOutlinedInput-input': { color: '#000' }
+                }}
+              />
+
+            <TextField
+                label="Teléfono"
+                value={formData.phone}
+                onChange={handleInputChange('phone')}
+                fullWidth
+                required
+                placeholder="Ej: 3001234567"
+                sx={{
+                  '& .MuiInputLabel-root': { color: '#000' },
+                  '& .MuiOutlinedInput-input': { color: '#000' }
+                }}
+              />
+            </Box>
+
             {/* Información adicional */}
             <Typography variant="subtitle1" sx={{ fontWeight: 'medium', color: '#000', mb: 1, mt: 2 }}>
               Información Adicional
@@ -268,33 +295,7 @@ export const MonitorFormDialog = ({ open, onClose, onSuccess }: MonitorFormDialo
                   '& .MuiOutlinedInput-input': { color: '#000' }
                 }}
               />
-              <TextField
-                label="Teléfono"
-                value={formData.phone}
-                onChange={handleInputChange('phone')}
-                fullWidth
-                required
-                placeholder="Ej: 3001234567"
-                sx={{
-                  '& .MuiInputLabel-root': { color: '#000' },
-                  '& .MuiOutlinedInput-input': { color: '#000' }
-                }}
-              />
-            </Box>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-              <TextField
-                label="Número de Documento"
-                value={formData.document_id}
-                onChange={handleInputChange('document_id')}
-                fullWidth
-                required
-                placeholder="Ej: 100200300"
-                sx={{
-                  '& .MuiInputLabel-root': { color: '#000' },
-                  '& .MuiOutlinedInput-input': { color: '#000' }
-                }}
-              />
               <FormControl fullWidth required>
                 <InputLabel sx={{ color: '#000' }}>Rol</InputLabel>
                 <Select

@@ -53,6 +53,7 @@ const LoanDetailDialog = ({
     const statusConfig = {
       ABIERTO: { color: "warning" as const, label: "Abierto" },
       CERRADO: { color: "success" as const, label: "Cerrado" },
+      VENCIDO: { color: "error" as const, label: "Vencido" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || {
@@ -74,8 +75,9 @@ const LoanDetailDialog = ({
     const stateConfig = {
       BUENO: { color: "success" as const },
       FUNCIONAL: { color: "info" as const },
-      DAÑADO: { color: "error" as const },
-      EN_REPARACION: { color: "warning" as const },
+      DAÑO_LEVE: { color: "warning" as const },
+      NO_FUNCIONA: { color: "error" as const },
+      PERDIDO: { color: "warning" as const },
     };
 
     const config = stateConfig[state as keyof typeof stateConfig] || {
@@ -303,7 +305,7 @@ const LoanDetailDialog = ({
 
         <Box>
           <Typography variant="h6" gutterBottom color="primary">
-            Hardware Prestado ({loan.hardwares.length})
+            Equipo Prestado ({loan.hardwares.length})
           </Typography>
           
           <TableContainer component={Paper} variant="outlined">
@@ -379,6 +381,35 @@ const LoanDetailDialog = ({
                 Agregar Hardware
               </Button>
             )}
+            
+            {onReturnHardware && loan.hardwares.some(item => !item.returned_at) && (
+              <Button
+                onClick={() => onReturnHardware(loan)}
+                variant="outlined"
+                startIcon={<Assignment />}
+                size="small"
+                color="info"
+              >
+                Devolver Hardware
+              </Button>
+            )}
+            
+            {onCloseLoan && (
+              <Button
+                onClick={() => onCloseLoan(loan)}
+                variant="outlined"
+                startIcon={<Lock />}
+                size="small"
+                color="warning"
+              >
+                Cerrar Préstamo
+              </Button>
+            )}
+          </Box>
+        )}
+        {/* Botones de acción solo si el préstamo está vencido */}
+        {loan.status === 'VENCIDO' && (
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
             
             {onReturnHardware && loan.hardwares.some(item => !item.returned_at) && (
               <Button

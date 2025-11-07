@@ -26,14 +26,16 @@ interface HardwareEditDialogProps {
   open: boolean;
   hardware: Hardware | null;
   onClose: () => void;
-  onSuccess: (updatedHardware: Hardware) => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
 export const HardwareEditDialog = ({ 
   open, 
   hardware, 
   onClose, 
-  onSuccess 
+  onSuccess,
+  onError 
 }: HardwareEditDialogProps) => {
   const { loading, error, updateHardware, clearError } = useUpdateHardware();
   
@@ -99,10 +101,13 @@ export const HardwareEditDialog = ({
     const result = await updateHardware(hardware.serial, changedFields);
     
     if (result) {
-      onSuccess(result);
+      onSuccess("Equipo editado correctamente");
       onClose();
     }
-  }, [hardware, formData, updateHardware, onSuccess, onClose]);
+    else{
+      onError("Error al editar el equipo")
+    }
+  }, [hardware, formData, updateHardware, onSuccess, onClose, onError]);
 
   const handleClose = useCallback(() => {
     clearError();
@@ -129,7 +134,7 @@ export const HardwareEditDialog = ({
         <EditIcon color="primary" />
         <Box>
           <Typography variant="h6" component="div">
-            Editar Hardware
+            Editar Equipo
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Serial: {hardware.serial}

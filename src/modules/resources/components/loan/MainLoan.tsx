@@ -23,6 +23,9 @@ const MainLoan = () => {
   const [addHardwareDialogOpen, setAddHardwareDialogOpen] = useState(false);
   const [returnHardwareDialogOpen, setReturnHardwareDialogOpen] = useState(false);
   const [closeLoanDialogOpen, setCloseLoanDialogOpen] = useState(false);
+
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState(false);
   const { navigateToMain } = useResourceNavigation();
 
   const { 
@@ -35,6 +38,17 @@ const MainLoan = () => {
     searchLoans, 
     clearSearch 
   } = useGetLoanData();
+
+  const handleGlobalSuccess = (message: string) => {
+    setGlobalMessage(message);
+    setGlobalError(false);
+    refetch();
+  };
+
+  const handleGlobalError = (message: string) => {
+    setGlobalMessage(message);
+    setGlobalError(true);
+  };
 
   const handleViewDetails = (loan: Loan) => {
     setSelectedLoan(loan);
@@ -50,23 +64,10 @@ const MainLoan = () => {
     setCreateDialogOpen(true);
   };
 
-  const handleCreateSuccess = () => {
-    refetch(); 
-  };
-
-  const handleCloseCreateDialog = () => {
-    setCreateDialogOpen(false);
-  };
-
   const handleAddHardware = (loan: Loan) => {
     setSelectedLoan(loan);
     setDetailDialogOpen(false);
     setAddHardwareDialogOpen(true);
-  };
-
-  const handleCloseAddHardwareDialog = () => {
-    setAddHardwareDialogOpen(false);
-    setSelectedLoan(null);
   };
 
   const handleReturnHardware = (loan: Loan) => {
@@ -75,24 +76,10 @@ const MainLoan = () => {
     setReturnHardwareDialogOpen(true);
   };
 
-  const handleCloseReturnHardwareDialog = () => {
-    setReturnHardwareDialogOpen(false);
-    setSelectedLoan(null);
-  };
-
   const handleCloseLoan = (loan: Loan) => {
     setSelectedLoan(loan);
     setDetailDialogOpen(false);
     setCloseLoanDialogOpen(true);
-  };
-
-  const handleCloseCloseLoanDialog = () => {
-    setCloseLoanDialogOpen(false);
-    setSelectedLoan(null);
-  };
-
-  const handleActionSuccess = () => {
-    refetch();
   };
 
   return (
@@ -109,6 +96,17 @@ const MainLoan = () => {
           searchTerm={searchTerm}
           loading={loading}
         />
+
+        {globalMessage && (
+          <Alert
+            severity={globalError ? "error" : "success"}
+            sx={{ mb: 2 }}
+            onClose={() => setGlobalMessage(null)}
+          >
+            {globalMessage}
+          </Alert>
+        )}
+
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
@@ -141,29 +139,16 @@ const MainLoan = () => {
         />
 
         <CreateLoanDialog
-          open={createDialogOpen}
-          onClose={handleCloseCreateDialog}
-          onSuccess={handleCreateSuccess}
-        />
+          open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} onSuccess={handleGlobalSuccess} onError={handleGlobalError} />
+        
         <AddHardwareDialog
-          open={addHardwareDialogOpen}
-          onClose={handleCloseAddHardwareDialog}
-          onSuccess={handleActionSuccess}
-          loan={selectedLoan}
-        />
+          open={addHardwareDialogOpen} onClose={() => setAddHardwareDialogOpen(false)} onSuccess={handleGlobalSuccess} onError={handleGlobalError} loan={selectedLoan} />
 
         <ReturnHardwareDialog
-          open={returnHardwareDialogOpen}
-          onClose={handleCloseReturnHardwareDialog}
-          onSuccess={handleActionSuccess}
-          loan={selectedLoan}
-        />
+          open={returnHardwareDialogOpen} onClose={() => setReturnHardwareDialogOpen(false)} onSuccess={handleGlobalSuccess} onError={handleGlobalError} loan={selectedLoan} />
 
         <CloseLoanDialog
-          open={closeLoanDialogOpen}
-          onClose={handleCloseCloseLoanDialog}
-          onSuccess={handleActionSuccess}
-          loan={selectedLoan}
+          open={closeLoanDialogOpen} onClose={() => setCloseLoanDialogOpen(false)} onSuccess={handleGlobalSuccess} onError={handleGlobalError} loan={selectedLoan}
         />
       </Box>
     </Container>

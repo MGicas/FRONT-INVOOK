@@ -27,7 +27,7 @@ interface MonitorDeleteDialogProps {
   open: boolean;
   monitor: Monitor | null;
   onClose: () => void;
-  onSuccess?: (monitor: Monitor) => void;
+  onSuccess?: (message: string, isError: boolean) => void;
 }
 
 const STATE_OPTIONS = [
@@ -52,9 +52,12 @@ export const MonitorDeleteDialog = ({ open, monitor, onClose, onSuccess }: Monit
     const result = await changeMonitorState(monitor.id, selectedState);
     
     if (result && onSuccess) {
-      onSuccess(result);
+      onSuccess("Monitor eliminado correctamente", false);
       resetForm();
       onClose();
+    }
+    else if (error && onSuccess) {
+      onSuccess(error, true);
     }
   }, [monitor, selectedState, changeMonitorState, onSuccess, resetForm, onClose]);
 

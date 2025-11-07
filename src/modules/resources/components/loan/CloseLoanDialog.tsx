@@ -17,11 +17,12 @@ import type { Loan } from "../../model/Loan";
 interface CloseLoanDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
   loan: Loan | null;
 }
 
-const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProps) => {
+const CloseLoanDialog = ({ open, onClose, onSuccess, onError, loan }: CloseLoanDialogProps) => {
   const { closeLoanMutation, loading, error } = useCloseLoan();
 
   const handleSubmit = async () => {
@@ -29,10 +30,11 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
 
     try {
       await closeLoanMutation(loan.id);
-      onSuccess();
+      onSuccess("Préstamo cerrado correctamente");
       onClose();
     } catch (error) {
-      console.error("Error closing loan:", error);
+      console.error("Error cerrando el préstamo:", error);
+      onError("No fue posible cerrar el préstamo");
     }
   };
 
@@ -40,7 +42,7 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
 
   const pendingHardware = loan.hardwares.filter(item => !item.returned_at);
   const returnedHardware = loan.hardwares.filter(item => item.returned_at);
-  const canClose = loan.status === 'ABIERTO';
+  const canClose = loan.status === 'ABIERTO' || loan.status === 'VENCIDO';
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -92,12 +94,12 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
           {/* Estado del hardware */}
           <Box>
             <Typography variant="subtitle2" gutterBottom>
-              Estado del Hardware
+              Estado del Equipo
             </Typography>
             
             <Box sx={{ mb: 2 }}>
               <Typography variant="body2" color="success.main" gutterBottom>
-                Hardware Devuelto ({returnedHardware.length})
+                Equipo Devuelto ({returnedHardware.length})
               </Typography>
               {returnedHardware.length > 0 ? (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -113,14 +115,14 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
                 </Box>
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  No hay hardware devuelto
+                  No hay equipo devuelto
                 </Typography>
               )}
             </Box>
 
             <Box>
               <Typography variant="body2" color="error.main" gutterBottom>
-                Hardware Pendiente ({pendingHardware.length})
+                Equipo Pendiente ({pendingHardware.length})
               </Typography>
               {pendingHardware.length > 0 ? (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -136,7 +138,7 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
                 </Box>
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  Todo el hardware ha sido devuelto
+                  Todo el equipo ha sido devuelto
                 </Typography>
               )}
             </Box>
@@ -152,8 +154,8 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
           {canClose && pendingHardware.length > 0 && (
             <Alert severity="warning" icon={<Warning />}>
               <Typography variant="body2">
-                <strong>Advertencia:</strong> Aún hay {pendingHardware.length} hardware(s) pendiente(s) de devolución. 
-                Al cerrar el préstamo, estos equipos quedarán marcados como no devueltos.
+                <strong>Advertencia:</strong> Aún hay {pendingHardware.length} equipo(s) pendiente(s) de devolución. 
+                Al cerrar el préstamo, estos equipos quedarán sin el estado actual en que fueron devuelto(s).
               </Typography>
             </Alert>
           )}
@@ -161,7 +163,7 @@ const CloseLoanDialog = ({ open, onClose, onSuccess, loan }: CloseLoanDialogProp
           {canClose && pendingHardware.length === 0 && (
             <Alert severity="success">
               <Typography variant="body2">
-                Todo el hardware ha sido devuelto correctamente. El préstamo está listo para ser cerrado.
+                Todos los equipos han sido devuelto correctamente. El préstamo está listo para ser cerrado.
               </Typography>
             </Alert>
           )}

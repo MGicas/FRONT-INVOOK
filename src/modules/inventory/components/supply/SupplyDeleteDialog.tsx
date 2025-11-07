@@ -21,8 +21,9 @@ import type { Supply } from "../../model/Supply";
 interface SupplyDeleteDialogProps {
   open: boolean;
   supply: Supply | null;
-  onClose: () => void;
-  onSuccess: () => void;
+  onClose: () => void; 
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
 export const SupplyDeleteDialog = ({
@@ -30,6 +31,7 @@ export const SupplyDeleteDialog = ({
   supply,
   onClose,
   onSuccess,
+  onError,
 }: SupplyDeleteDialogProps) => {
   const { loading, error, deleteSupply, clearError } = useDeleteSupply();
 
@@ -41,9 +43,10 @@ export const SupplyDeleteDialog = ({
     const result = await deleteSupply(supply.code);
 
     if (result) {
-      onSuccess();
+      onSuccess("Suministro eliminado correctamente");
       onClose();
     }
+    onError("Error al eliminar el suministro");
   }, [supply, deleteSupply, onSuccess, onClose]);
 
   const handleClose = useCallback(() => {

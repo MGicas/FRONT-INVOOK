@@ -1,6 +1,7 @@
 import { Box, Typography, Container, Paper } from "@mui/material";
 import { Home as HomeIcon } from "@mui/icons-material";
 import { StatsCards } from "./StatsCards";
+import SendMessage from "./SendMessage";
 
 const HomePage = () => {
   return (
@@ -48,6 +49,10 @@ const HomePage = () => {
             diferentes secciones del sistema. Puedes gestionar el inventario,
             usuarios, préstamos y mucho más.
           </Typography>
+
+          <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+            <SendMessage />
+          </Box>
         </Paper>
       </Box>
     </Container>

@@ -19,6 +19,9 @@ export function extractBackendMessage(errorOrResponse: any): string {
       "Error en la operación."
     );
   }
+  if (errorOrResponse?.message || errorOrResponse?.detail || errorOrResponse?.error) {
+    return errorOrResponse.message || errorOrResponse.error || errorOrResponse.detail;
+}
 
   // Caso 3: Error sin estructura conocida
   return "Error inesperado.";

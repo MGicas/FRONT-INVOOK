@@ -53,6 +53,11 @@ export const getAllMonitors = async (): Promise<Monitor[]> => {
   return allMonitors;
 };
 
+export const getMonitorById = async (id: string): Promise<Monitor> => {
+  const response = await apiService.get<Monitor>(`users/admins/${id}/`);
+  return response;
+};
+
 export const searchMonitors = async (
   searchTerm: string,
   page: number = 1
@@ -87,4 +92,5 @@ const extractPageFromUrl = (url: string): number | null => {
 export default {
   getAll: getMonitors,
   search: searchMonitors,
+  getById: getMonitorById,
 };

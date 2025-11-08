@@ -9,5 +9,6 @@ export const ENDPOINTS = {
     PRESTAMISTAS: BASE_URL + "users/lenders/",
     MONITORES: BASE_URL + "users/admins/",
     PRESTAMOS: BASE_URL + "loan/",
-    CONSUMOS: BASE_URL + "consum/"
+    CONSUMOS: BASE_URL + "consum/",
+    MENSAJES: BASE_URL + "users/overdue/send-messages/"
 }

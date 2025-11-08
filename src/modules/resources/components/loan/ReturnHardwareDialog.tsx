@@ -9,7 +9,7 @@ import {
   Typography,
   Alert,
   FormControl,
-  InputLabel,
+  TextField,
   Select,
   MenuItem,
   Checkbox,
@@ -23,8 +23,11 @@ import {
   Paper,
   IconButton,
 } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import { Close } from "@mui/icons-material";
 import { useReturnHardware } from "../../hook/useReturnHardware";
+import { getMonitorById } from "../../../users/service/getMonitor";
+
 import type { Loan, HardwareState } from "../../model/Loan";
 
 interface ReturnHardwareDialogProps {
@@ -47,6 +50,9 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: Retur
   const { returnHardwareMutation, loading, error } = useReturnHardware();
   const [monitorId, setMonitorId] = useState("");
   const [hardwareList, setHardwareList] = useState<HardwareReturnForm[]>([]);
+  const [monitorValid, setMonitorValid] = useState(true);
+  const [monitorHelper, setMonitorHelper] = useState<string>("");
+  const [validatingMonitor, setValidatingMonitor] = useState(false);
 
   // Inicializar la lista de hardware cuando se abre el diálogo
   useEffect(() => {
@@ -60,6 +66,8 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: Retur
       }));
       setHardwareList(list);
       setMonitorId(loan.id_monitor.id.toString());
+      setMonitorValid(true);
+      setMonitorHelper("");
     }
   }, [loan, open]);
 
@@ -126,7 +134,32 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: Retur
 
   const selectedCount = hardwareList.filter(item => item.selected && !item.isReturned).length;
   const availableCount = hardwareList.filter(item => !item.isReturned).length;
-  const isFormValid = selectedCount > 0 && monitorId;
+  const isFormValid = selectedCount > 0 && monitorValid && !!monitorId && !validatingMonitor;
+
+  const validateMonitor = async () => {
+    const id = monitorId.trim();
+    if (!id) {
+      setMonitorValid(false);
+      setMonitorHelper("Ingresa el ID del monitor");
+      return;
+    }
+    if (!/^\d+$/.test(id)) {
+      setMonitorValid(false);
+      setMonitorHelper("El ID debe ser numérico");
+      return;
+    }
+    try {
+      setValidatingMonitor(true);
+      await getMonitorById(id);
+      setMonitorValid(true);
+      setMonitorHelper("ID válido");
+    } catch (e) {
+      setMonitorValid(false);
+      setMonitorHelper("ID de monitor no existe");
+    } finally {
+      setValidatingMonitor(false);
+    }
+  };
 
   const hardwareStates: { value: HardwareState; label: string; color: string }[] = [
     { value: 'BUENO', label: 'Bueno', color: '#4caf50' },
@@ -135,6 +168,23 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: Retur
     { value: 'NO_FUNCIONA', label: 'No funciona', color: '#ff5722' },
     { value: 'PERDIDO', label: 'Perdido', color: '#ff9800' },
   ];
+
+  if (loan?.status === 'CLOSED') {
+    return (
+      <Dialog open={open} onClose={onClose}>
+        <DialogTitle>Préstamo ya finalizado</DialogTitle>
+        <DialogContent>
+          <Alert severity="info">
+            Este préstamo ya fue devuelto completamente y no se pueden registrar más devoluciones.
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
 
   if (!loan) return null;
 
@@ -175,19 +225,22 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: Retur
               </Typography>
             </Box>
 
-            {/* Monitor responsable */}
+            {/* Monitor responsable por ID */}
             <FormControl fullWidth required>
-              <InputLabel>Monitor Responsable</InputLabel>
-              <Select
+              <TextField
+                label="Monitor Responsable (ID)"
                 value={monitorId}
-                onChange={(e) => setMonitorId(e.target.value)}
+                onChange={(e) => {
+                  setMonitorId(e.target.value);
+                  setMonitorValid(false);
+                  setMonitorHelper("");
+                }}
+                onBlur={validateMonitor}
                 disabled={loading}
-                label="Monitor Responsable"
-              >
-                <MenuItem value={loan.id_monitor.id.toString()}>
-                  {loan.id_monitor.username} - {loan.id_monitor.email}
-                </MenuItem>
-              </Select>
+                error={!monitorValid}
+                helperText={monitorHelper}
+                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              />
             </FormControl>
 
             {/* Selección de hardware */}
@@ -259,7 +312,7 @@ const ReturnHardwareDialog = ({ open, onClose, onSuccess, onError, loan }: Retur
                             <FormControl size="small" fullWidth disabled={!item.selected || loading}>
                               <Select
                                 value={item.state}
-                                onChange={(e) => handleStateChange(item.serial, e.target.value as HardwareState)}
+                                onChange={(e: SelectChangeEvent<HardwareState>) => handleStateChange(item.serial, e.target.value as HardwareState)}
                               >
                                 {hardwareStates.map((state) => (
                                   <MenuItem key={state.value} value={state.value}>

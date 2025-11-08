@@ -11,13 +11,27 @@ export interface HardwareTypeResponse {
   description: string;
 }
 
+const generateRandomId = (): string => {
+  try {
+    const globalCrypto: any = (typeof globalThis !== "undefined" ? (globalThis as any).crypto : undefined);
+    if (globalCrypto && typeof globalCrypto.randomUUID === "function") {
+      return globalCrypto.randomUUID();
+    }
+  } catch (_) {
+    // ignore and use fallback
+  }
+  // Fallback: timestamp + random segment
+  return `ht_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+};
+
 export const createHardwareType = async (
   data: CreateHardwareTypeRequest
 ): Promise<HardwareTypeResponse> => {
   // Matches API: /api/v1/invook/inventory/hardware-types/
+  const payload = { id: generateRandomId(), ...data };
   const response = await apiService.post<HardwareTypeResponse>(
     "inventory/hardware-types/",
-    data
+    payload
   );
   return response;
 };

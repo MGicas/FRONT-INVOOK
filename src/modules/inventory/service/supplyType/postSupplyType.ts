@@ -11,12 +11,27 @@ export interface SupplyTypeResponse {
   description: string;
 }
 
+// Simple ID generator using Web Crypto when available, with a fallback
+const generateRandomId = (): string => {
+  try {
+    const globalCrypto: any = (typeof globalThis !== "undefined" ? (globalThis as any).crypto : undefined);
+    if (globalCrypto && typeof globalCrypto.randomUUID === "function") {
+      return globalCrypto.randomUUID();
+    }
+  } catch (_) {
+    // ignore and use fallback
+  }
+  // Fallback: timestamp + random segment
+  return `st_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+};
+
 export const createSupplyType = async (
   data: CreateSupplyTypeRequest
 ): Promise<SupplyTypeResponse> => {
+  const payload = { id: generateRandomId(), ...data };
   const response = await apiService.post<SupplyTypeResponse>(
     "inventory/supply-types/",
-    data
+    payload
   );
   return response;
 };
